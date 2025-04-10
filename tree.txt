@@ -1,0 +1,23 @@
+├── netlify/
+│   └── functions/
+│       ├── auth.ts          # Lógica de autenticación (Firebase/Supabase)
+│       └── db.ts            # Conexión a MongoDB u operaciones de base de datos
+│
+├── public/                  # Archivos públicos (favicon, imágenes, etc.)
+│
+├── src/
+│   ├── app/                 # Páginas usando el nuevo App Router (Next.js 13+)
+│   ├── components/          # Componentes reutilizables (UI, cards, etc.)
+│   ├── lib/                 # Firebase, Mongoose y otras librerías internas
+│   ├── styles/              # CSS o Tailwind custom
+│   └── utils/               # Funciones auxiliares o helpers
+│
+├── .gitignore               # Archivos y carpetas que Git debe ignorar
+├── eslint.config.mjs       # Configuración de ESLint
+├── next-env.d.ts           # Declaraciones de entorno para TypeScript
+├── next.config.ts          # Configuración de Next.js
+├── package.json            # Dependencias y scripts del proyecto
+├── package-lock.json       # Detalles exactos de instalación (npm)
+├── postcss.config.mjs      # Configuración para PostCSS + Tailwind
+├── README.md               # Documentación del proyecto
+└── tsconfig.json           # Configuración de TypeScript
