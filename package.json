@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@netlify/functions": "^3.0.4",
     "cloudinary": "^2.6.0",
     "firebase": "^11.6.0",
     "mongoose": "^8.13.2",
