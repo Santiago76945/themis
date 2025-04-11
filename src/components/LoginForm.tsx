@@ -7,41 +7,91 @@ import "./LoginForm.css";
 
 interface LoginFormProps {
   onLogin: (email: string, password: string) => Promise<void>;
-  onGuestAccess: (guestPassword: string) => Promise<void>;
+  onInternalKeyCreate: (internalKey: string, firstName: string, lastName: string) => Promise<void>;
   onGoogleLogin: () => Promise<void>;
   onAppleLogin: () => Promise<void>;
-  onRegister: (email: string, password: string) => Promise<void>;
+  onRegister: (
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string
+  ) => Promise<void>;
 }
 
 export default function LoginForm({
   onLogin,
-  onGuestAccess,
+  onInternalKeyCreate,
   onGoogleLogin,
   onAppleLogin,
   onRegister,
 }: LoginFormProps) {
+  // Estados para login/registro tradicional
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [guestPassword, setGuestPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  
+  // Estados para el usuario de clave interna
+  const [internalKey, setInternalKey] = useState("");
+  const [internalFirstName, setInternalFirstName] = useState("");
+  const [internalLastName, setInternalLastName] = useState("");
+  const [showInternalKeyForm, setShowInternalKeyForm] = useState(false);
+
+  // Estado para controlar el modo: login o registro
   const [isRegister, setIsRegister] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isRegister) {
-      await onRegister(email, password);
+      if (!firstName || !lastName) {
+        alert("Por favor ingresa tu nombre y apellido");
+        return;
+      }
+      await onRegister(email, password, firstName, lastName);
     } else {
       await onLogin(email, password);
     }
   };
 
-  const handleGuest = async () => {
-    await onGuestAccess(guestPassword);
+  const handleInternalKey = async () => {
+    if (!internalFirstName || !internalLastName) {
+      alert("Por favor ingresa tu nombre y apellido");
+      return;
+    }
+    await onInternalKeyCreate(internalKey, internalFirstName, internalLastName);
   };
 
   return (
     <div className="card">
+      {/* Logo y branding */}
+      <div className="logo-container">
+        <img src="/logo.png" alt="Logo" className="logo" />
+        <h1 className="logo-title">Themis</h1>
+        <h2 className="logo-subtitle">Asistente Legal</h2>
+      </div>
+      
       {/* Formulario para login / registro */}
       <form onSubmit={handleSubmit} className="form">
+        {isRegister && (
+          <>
+            <input
+              type="text"
+              placeholder="Nombre"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="input"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Apellido"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="input"
+              required
+            />
+          </>
+        )}
         <input
           type="email"
           placeholder="Correo electrónico"
@@ -94,19 +144,43 @@ export default function LoginForm({
 
       <hr className="divider" />
 
-      {/* Sección para acceso de invitado */}
+      {/* Sección para crear usuario a partir de clave interna */}
       <div>
-        <input
-          type="password"
-          placeholder="Contraseña de invitado"
-          value={guestPassword}
-          onChange={(e) => setGuestPassword(e.target.value)}
-          className="input"
-          required
-        />
-        <button onClick={handleGuest} className="btn btn-secondary">
-          Acceso de invitado
-        </button>
+        {showInternalKeyForm ? (
+          <>
+            <input
+              type="text"
+              placeholder="Nombre"
+              value={internalFirstName}
+              onChange={(e) => setInternalFirstName(e.target.value)}
+              className="input"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Apellido"
+              value={internalLastName}
+              onChange={(e) => setInternalLastName(e.target.value)}
+              className="input"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Clave interna"
+              value={internalKey}
+              onChange={(e) => setInternalKey(e.target.value)}
+              className="input"
+              required
+            />
+            <button onClick={handleInternalKey} className="btn btn-secondary">
+              Crear usuario con clave interna
+            </button>
+          </>
+        ) : (
+          <button onClick={() => setShowInternalKeyForm(true)} className="btn btn-secondary">
+            Crear usuario con clave interna
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,23 @@
 /* // src/components/LoginForm.css */
 
+/* Definición de variables para una paleta con mejor contraste */
+:root {
+  --primary-bg: #005fcc;           /* Azul oscuro para botones primarios */
+  --primary-bg-hover: #004a99;     /* Azul aún más oscuro en hover */
+  --secondary-bg: #404040;         /* Gris oscuro para botones secundarios */
+  --secondary-bg-hover: #333333;   /* Gris más oscuro en hover */
+  --google-bg: #db4437;            /* Rojo característico de Google */
+  --google-bg-hover: #c33d32;      /* Variante más oscura para hover */
+  --apple-bg: #000000;             /* Negro para Apple */
+  --apple-bg-hover: #222222;       /* Variante en hover */
+  --text-color: #1a1a1a;           /* Texto en color muy oscuro */
+  --card-bg: #ffffff;              /* Fondo blanco para tarjetas */
+  --body-bg: #f2f2f2;              /* Fondo gris claro para el body */
+  --input-bg: #ffffff;             /* Fondo blanco para los inputs */
+  --input-border: #777777;         /* Borde más oscuro para inputs */
+}
+
+/* Reset básico */
 * {
   margin: 0;
   padding: 0;
@@ -8,19 +26,21 @@
 
 body {
   font-family: sans-serif;
-  background-color: #f2f2f2;
-  color: #333;
+  background-color: var(--body-bg);
+  color: var(--text-color);
 }
 
+/* Estilo de la tarjeta */
 .card {
-  background-color: #fff;
+  background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   max-width: 400px;
   margin: 2rem auto;
   padding: 2rem;
 }
 
+/* Estilo del formulario */
 .form {
   display: flex;
   flex-direction: column;
@@ -28,14 +48,15 @@ body {
 }
 
 .input {
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
   border-radius: 4px;
   padding: 0.75rem;
   font-size: 1rem;
   width: 100%;
-  background-color: #fafafa;
+  background-color: var(--input-bg);
 }
 
+/* Estilos generales para botones */
 .btn {
   border: none;
   border-radius: 4px;
@@ -47,53 +68,103 @@ body {
   text-align: center;
 }
 
+/* Botón primario */
 .btn-primary {
-  background-color: #444;
-  color: #fff;
+  background-color: var(--primary-bg);
+  color: #ffffff;
 }
 
 .btn-primary:hover {
-  background-color: #666;
+  background-color: var(--primary-bg-hover);
 }
 
+/* Botón secundario */
 .btn-secondary {
-  background-color: #888;
-  color: #fff;
+  background-color: var(--secondary-bg);
+  color: #ffffff;
 }
 
 .btn-secondary:hover {
-  background-color: #aaa;
+  background-color: var(--secondary-bg-hover);
 }
 
+/* Enlaces de texto */
 .text-link {
-  color: #444;
+  color: var(--primary-bg);
   text-decoration: underline;
   cursor: pointer;
 }
 
 .text-link:hover {
-  color: #666;
+  color: var(--primary-bg-hover);
 }
 
+/* Separador */
 .divider {
   margin: 2rem 0;
   border: none;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--input-border);
 }
 
+/* Botones para login con redes sociales */
 .btn-google {
-  background-color: #333;
+  background-color: var(--google-bg);
+  color: #ffffff;
   margin-bottom: 0.5rem;
 }
 
 .btn-google:hover {
-  background-color: #555;
+  background-color: var(--google-bg-hover);
 }
 
 .btn-apple {
-  background-color: #000;
+  background-color: var(--apple-bg);
+  color: #ffffff;
 }
 
 .btn-apple:hover {
-  background-color: #222;
+  background-color: var(--apple-bg-hover);
+}
+
+.card > * + * {
+  margin-top: 1rem;
+}
+
+.text-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--primary-bg);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.text-link:hover {
+  color: var(--primary-bg-hover);
+}
+
+/* Nuevas líneas para la sección de logo */
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.logo-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.logo-subtitle {
+  font-size: 1rem;
+  margin: 0;
 }
