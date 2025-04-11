@@ -2,21 +2,29 @@
 
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LoginForm from "@/components/LoginForm";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/menu");
+    }
+  }, [user, router]);
 
   const handleLogin = async (username: string, password: string) => {
-    // Aquí se integraría la lógica con Firebase Auth o Supabase Auth.
+    // Aquí integras la lógica (por ejemplo, utilizando Firebase Auth)
     console.log("login normal con:", username, password);
-    // Simulación: redirigir al menú una vez autentificado
+    // Simulación: redirigir al dashboard una vez autentificado
     router.push("/menu");
   };
 
   const handleGuestAccess = async (guestPassword: string) => {
-    // Validación simple contra una contraseña en la nube (puede venir desde una variable de entorno)
     if (guestPassword === process.env.NEXT_PUBLIC_GUEST_PASSWORD) {
       console.log("Acceso de desarrollador concedido");
       router.push("/menu");
@@ -27,10 +35,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <LoginForm
-        onLogin={handleLogin}
-        onGuestAccess={handleGuestAccess}
-      />
+      <LoginForm onLogin={handleLogin} onGuestAccess={handleGuestAccess} />
     </div>
   );
 }

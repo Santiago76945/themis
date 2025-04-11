@@ -1,100 +1,71 @@
 // src/components/LoginForm.tsx
 
 "use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail } from "@/lib/firebaseAuth";
 
-export default function LoginForm() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
+interface LoginFormProps {
+  onLogin: (username: string, password: string) => Promise<void>;
+  onGuestAccess: (guestPassword: string) => Promise<void>;
+}
+
+export default function LoginForm({ onLogin, onGuestAccess }: LoginFormProps) {
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [guestPassword, setGuestPassword] = useState("");
 
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithGoogle();
-      console.log("Usuario con Google:", result.user);
-      router.push("/menu");
-    } catch (error) {
-      console.error("Error al iniciar sesión con Google:", error);
-    }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await onLogin(username, password);
   };
 
-  const handleAppleLogin = async () => {
-    try {
-      const result = await signInWithApple();
-      console.log("Usuario con Apple:", result.user);
-      router.push("/menu");
-    } catch (error) {
-      console.error("Error al iniciar sesión con Apple:", error);
-    }
-  };
-
-  const handleEmailLogin = async () => {
-    try {
-      const result = await signInWithEmail(email, password);
-      console.log("Usuario con Email:", result.user);
-      router.push("/menu");
-    } catch (error) {
-      console.error("Error al iniciar sesión con Email:", error);
-    }
-  };
-
-  const handleSignUp = async () => {
-    try {
-      const result = await signUpWithEmail(email, password);
-      console.log("Usuario registrado:", result.user);
-      router.push("/menu");
-    } catch (error) {
-      console.error("Error al registrar usuario con Email:", error);
-    }
+  const handleGuest = async () => {
+    await onGuestAccess(guestPassword);
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 shadow rounded-lg bg-white">
-      <h2 className="text-xl font-bold mb-4">Iniciar Sesión</h2>
-      <div className="flex flex-col gap-4">
+    <div className="p-4 bg-white rounded shadow">
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Usuario"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="border p-2 my-2 w-full"
+          required
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="border p-2 my-2 w-full"
+          required
+        />
         <button
-          onClick={handleGoogleLogin}
-          className="bg-red-500 p-2 text-white rounded hover:bg-red-600"
+          type="submit"
+          className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
         >
-          Iniciar sesión con Google
+          Iniciar Sesión
         </button>
+      </form>
+
+      <hr className="my-4" />
+
+      <div>
+        <input
+          type="password"
+          placeholder="Contraseña de invitado"
+          value={guestPassword}
+          onChange={(e) => setGuestPassword(e.target.value)}
+          className="border p-2 my-2 w-full"
+          required
+        />
         <button
-          onClick={handleAppleLogin}
-          className="bg-black p-2 text-white rounded hover:bg-gray-800"
+          onClick={handleGuest}
+          className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
         >
-          Iniciar sesión con Apple
+          Acceso de invitado
         </button>
-        <div className="flex flex-col gap-2">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Correo electrónico"
-            className="p-2 border rounded"
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Contraseña"
-            className="p-2 border rounded"
-          />
-          <button
-            onClick={handleEmailLogin}
-            className="bg-blue-500 p-2 text-white rounded hover:bg-blue-600"
-          >
-            Iniciar sesión con Email
-          </button>
-          <button
-            onClick={handleSignUp}
-            className="bg-green-500 p-2 text-white rounded hover:bg-green-600"
-          >
-            Regístrate con Email
-          </button>
-        </div>
       </div>
     </div>
   );
