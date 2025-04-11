@@ -1,21 +1,37 @@
 // src/components/LoginForm.tsx
 
 "use client";
+
 import { useState } from "react";
+import "./LoginForm.css";
 
 interface LoginFormProps {
-  onLogin: (username: string, password: string) => Promise<void>;
+  onLogin: (email: string, password: string) => Promise<void>;
   onGuestAccess: (guestPassword: string) => Promise<void>;
+  onGoogleLogin: () => Promise<void>;
+  onAppleLogin: () => Promise<void>;
+  onRegister: (email: string, password: string) => Promise<void>;
 }
 
-export default function LoginForm({ onLogin, onGuestAccess }: LoginFormProps) {
-  const [username, setUsername] = useState("");
+export default function LoginForm({
+  onLogin,
+  onGuestAccess,
+  onGoogleLogin,
+  onAppleLogin,
+  onRegister,
+}: LoginFormProps) {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [guestPassword, setGuestPassword] = useState("");
+  const [isRegister, setIsRegister] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await onLogin(username, password);
+    if (isRegister) {
+      await onRegister(email, password);
+    } else {
+      await onLogin(email, password);
+    }
   };
 
   const handleGuest = async () => {
@@ -23,14 +39,15 @@ export default function LoginForm({ onLogin, onGuestAccess }: LoginFormProps) {
   };
 
   return (
-    <div className="p-4 bg-white rounded shadow">
-      <form onSubmit={handleSubmit}>
+    <div className="card">
+      {/* Formulario para login / registro */}
+      <form onSubmit={handleSubmit} className="form">
         <input
-          type="text"
-          placeholder="Usuario"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="border p-2 my-2 w-full"
+          type="email"
+          placeholder="Correo electrónico"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="input"
           required
         />
         <input
@@ -38,32 +55,56 @@ export default function LoginForm({ onLogin, onGuestAccess }: LoginFormProps) {
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 my-2 w-full"
+          className="input"
           required
         />
-        <button
-          type="submit"
-          className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-        >
-          Iniciar Sesión
+        <button type="submit" className="btn btn-primary">
+          {isRegister ? "Registrarse" : "Iniciar Sesión"}
         </button>
       </form>
 
-      <hr className="my-4" />
+      {/* Botones para login con redes sociales */}
+      <div>
+        <button onClick={onGoogleLogin} className="btn btn-google">
+          Iniciar sesión con Google
+        </button>
+        <button onClick={onAppleLogin} className="btn btn-apple">
+          Iniciar sesión con Apple
+        </button>
+      </div>
 
+      {/* Toggle para cambiar entre login y registro */}
+      <div style={{ marginTop: "1rem", textAlign: "center" }}>
+        {isRegister ? (
+          <p>
+            ¿Ya tienes una cuenta?{" "}
+            <button onClick={() => setIsRegister(false)} className="text-link">
+              Inicia sesión
+            </button>
+          </p>
+        ) : (
+          <p>
+            ¿No tienes cuenta?{" "}
+            <button onClick={() => setIsRegister(true)} className="text-link">
+              Regístrate
+            </button>
+          </p>
+        )}
+      </div>
+
+      <hr className="divider" />
+
+      {/* Sección para acceso de invitado */}
       <div>
         <input
           type="password"
           placeholder="Contraseña de invitado"
           value={guestPassword}
           onChange={(e) => setGuestPassword(e.target.value)}
-          className="border p-2 my-2 w-full"
+          className="input"
           required
         />
-        <button
-          onClick={handleGuest}
-          className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-        >
+        <button onClick={handleGuest} className="btn btn-secondary">
           Acceso de invitado
         </button>
       </div>

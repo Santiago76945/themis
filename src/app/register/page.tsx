@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { signUpWithEmail } from "@/lib/firebaseAuth";
 import { generateUniqueCode } from "@/utils/generateCode";
 import { getAuth, updateProfile } from "firebase/auth";
-import { app } from "@/lib/firebase"; // Importa la app ya inicializada
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -20,7 +19,7 @@ export default function RegisterPage() {
     e.preventDefault();
     try {
       const userCredential = await signUpWithEmail(email, password);
-      const auth = getAuth(app); // Se utiliza la instancia inicializada de Firebase
+      const auth = getAuth();
       const user = auth.currentUser;
       if (user) {
         // Generar el código de usuario único
@@ -32,7 +31,10 @@ export default function RegisterPage() {
         });
 
         // Aquí deberías almacenar en tu base de datos adicional:
-        // firstName, lastName, uniqueCode, etc.
+        // - firstName
+        // - lastName
+        // - uniqueCode
+        // (podrías hacer una llamada a tu API o a tu función en MongoDB)
         console.log("Datos de registro almacenados:", {
           uid: user.uid,
           firstName,
