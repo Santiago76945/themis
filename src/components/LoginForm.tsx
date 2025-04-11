@@ -6,8 +6,8 @@ import { useState } from "react";
 import "./LoginForm.css";
 
 interface LoginFormProps {
-  onLogin: (email: string, password: string) => Promise<void>;
-  onInternalKeyCreate: (internalKey: string, firstName: string, lastName: string) => Promise<void>;
+  onLogin: (identifier: string, password: string) => Promise<void>;
+  onInternalKeyCreate: (internalKey: string, internalPassword: string, firstName: string, lastName: string) => Promise<void>;
   onGoogleLogin: () => Promise<void>;
   onAppleLogin: () => Promise<void>;
   onRegister: (
@@ -26,13 +26,14 @@ export default function LoginForm({
   onRegister,
 }: LoginFormProps) {
   // Estados para login/registro tradicional
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // ahora es "identifier": puede ser email o ID
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   
   // Estados para el usuario de clave interna
   const [internalKey, setInternalKey] = useState("");
+  const [internalPassword, setInternalPassword] = useState("");
   const [internalFirstName, setInternalFirstName] = useState("");
   const [internalLastName, setInternalLastName] = useState("");
   const [showInternalKeyForm, setShowInternalKeyForm] = useState(false);
@@ -47,9 +48,9 @@ export default function LoginForm({
         alert("Por favor ingresa tu nombre y apellido");
         return;
       }
-      await onRegister(email, password, firstName, lastName);
+      await onRegister(identifier, password, firstName, lastName);
     } else {
-      await onLogin(email, password);
+      await onLogin(identifier, password);
     }
   };
 
@@ -58,7 +59,11 @@ export default function LoginForm({
       alert("Por favor ingresa tu nombre y apellido");
       return;
     }
-    await onInternalKeyCreate(internalKey, internalFirstName, internalLastName);
+    if (!internalPassword) {
+      alert("Por favor ingresa una contraseña para tu cuenta interna");
+      return;
+    }
+    await onInternalKeyCreate(internalKey, internalPassword, internalFirstName, internalLastName);
   };
 
   return (
@@ -93,10 +98,10 @@ export default function LoginForm({
           </>
         )}
         <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Correo electrónico o ID de usuario"
+          value={identifier}
+          onChange={(e) => setIdentifier(e.target.value)}
           className="input"
           required
         />
@@ -161,6 +166,14 @@ export default function LoginForm({
               placeholder="Apellido"
               value={internalLastName}
               onChange={(e) => setInternalLastName(e.target.value)}
+              className="input"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Contraseña para cuenta interna"
+              value={internalPassword}
+              onChange={(e) => setInternalPassword(e.target.value)}
               className="input"
               required
             />

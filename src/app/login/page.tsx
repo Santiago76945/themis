@@ -20,9 +20,38 @@ export default function LoginPage() {
     }
   }, [user, router]);
 
-  const handleLogin = async (email: string, password: string) => {
-    // Lógica para login tradicional (correo y contraseña)
-    console.log("Login normal con:", email, password);
+  const handleLogin = async (identifier: string, password: string) => {
+    let loginEmail = identifier;
+    // Si el identificador NO contiene "@" se asume que es un ID de usuario
+    if (!identifier.includes("@")) {
+      // Validar que sea un ID de 6 caracteres alfanuméricos
+      if (!/^[A-Za-z0-9]{6}$/.test(identifier)) {
+        alert("ID de usuario inválido. Debe ser 6 caracteres alfanuméricos.");
+        return;
+      }
+      // Consultar el endpoint para obtener el correo asociado al uniqueCode
+      try {
+        const response = await fetch(`/.netlify/functions/getUserEmailByUniqueCode?uniqueCode=${identifier}`);
+        const data = await response.json();
+        if (!response.ok) {
+          alert(data.error || "Error al obtener el correo asociado a este ID.");
+          return;
+        }
+        // Verificar que el método de registro no sea Apple o Google
+        if (data.registrationMethod === "apple" || data.registrationMethod === "google") {
+          alert("Los usuarios que se registraron con Apple o Google deben iniciar sesión con su correo electrónico.");
+          return;
+        }
+        loginEmail = data.email;
+      } catch (error) {
+        console.error("Error al obtener el email por ID:", error);
+        alert("Error al obtener la información de inicio de sesión. Intenta de nuevo.");
+        return;
+      }
+    }
+    // Procede con el inicio de sesión utilizando loginEmail y password.
+    console.log("Login normal con:", loginEmail, password);
+    // Aquí iría la lógica real de autenticación.
     router.push("/menu");
   };
 
@@ -106,7 +135,7 @@ export default function LoginPage() {
     }
   };
 
-  // También se mantiene la función para la clave interna, si se utiliza
+  // Función para crear usuario mediante clave interna
   const handleInternalKeyCreate = async (internalKey: string) => {
     if (internalKey === process.env.NEXT_PUBLIC_INTERNAL_KEY) {
       try {
