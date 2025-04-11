@@ -168,3 +168,6 @@ body {
   font-size: 1rem;
   margin: 0;
 }
+
+/* Agrega esta línea a LoginForm.css */
+.copyright { text-align: center; font-size: 0.8rem; margin-top: 1rem; color: #888; }

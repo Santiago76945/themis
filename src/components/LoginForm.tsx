@@ -195,6 +195,11 @@ export default function LoginForm({
           </button>
         )}
       </div>
+
+      {/* Copyright Disclaimer */}
+      <footer className="copyright">
+        Software propiedad de Santiago Haspert Piaggio. Todos los derechos reservados.
+      </footer>
     </div>
   );
 }
