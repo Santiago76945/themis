@@ -25,36 +25,37 @@ export default function LoginForm({
   onAppleLogin,
   onRegister,
 }: LoginFormProps) {
-  // Estados para login/registro tradicional
-  const [identifier, setIdentifier] = useState(""); // ahora es "identifier": puede ser email o ID
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   
-  // Estados para el usuario de clave interna
   const [internalKey, setInternalKey] = useState("");
   const [internalPassword, setInternalPassword] = useState("");
   const [internalFirstName, setInternalFirstName] = useState("");
   const [internalLastName, setInternalLastName] = useState("");
   const [showInternalKeyForm, setShowInternalKeyForm] = useState(false);
-
-  // Estado para controlar el modo: login o registro
+  
   const [isRegister, setIsRegister] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("Enviado formulario de login/registro, isRegister:", isRegister);
     if (isRegister) {
       if (!firstName || !lastName) {
         alert("Por favor ingresa tu nombre y apellido");
         return;
       }
+      console.log("Llamando onRegister con datos:", { identifier, password, firstName, lastName });
       await onRegister(identifier, password, firstName, lastName);
     } else {
+      console.log("Llamando onLogin con identifier:", identifier);
       await onLogin(identifier, password);
     }
   };
 
   const handleInternalKey = async () => {
+    console.log("Botón de creación de usuario interno presionado.");
     if (!internalFirstName || !internalLastName) {
       alert("Por favor ingresa tu nombre y apellido");
       return;
@@ -63,19 +64,17 @@ export default function LoginForm({
       alert("Por favor ingresa una contraseña para tu cuenta interna");
       return;
     }
+    console.log("Llamando onInternalKeyCreate con los datos internos:", { internalKey, internalPassword, internalFirstName, internalLastName });
     await onInternalKeyCreate(internalKey, internalPassword, internalFirstName, internalLastName);
   };
 
   return (
     <div className="card">
-      {/* Logo y branding */}
       <div className="logo-container">
         <img src="/logo.png" alt="Logo" className="logo" />
         <h1 className="logo-title">Themis</h1>
         <h2 className="logo-subtitle">Asistente Legal</h2>
       </div>
-      
-      {/* Formulario para login / registro */}
       <form onSubmit={handleSubmit} className="form">
         {isRegister && (
           <>
@@ -117,8 +116,6 @@ export default function LoginForm({
           {isRegister ? "Registrarse" : "Iniciar Sesión"}
         </button>
       </form>
-
-      {/* Botones para login con redes sociales */}
       <div>
         <button onClick={onGoogleLogin} className="btn btn-google">
           Iniciar sesión con Google
@@ -127,8 +124,6 @@ export default function LoginForm({
           Iniciar sesión con Apple
         </button>
       </div>
-
-      {/* Toggle para cambiar entre login y registro */}
       <div style={{ marginTop: "1rem", textAlign: "center" }}>
         {isRegister ? (
           <p>
@@ -146,10 +141,7 @@ export default function LoginForm({
           </p>
         )}
       </div>
-
       <hr className="divider" />
-
-      {/* Sección para crear usuario a partir de clave interna */}
       <div>
         {showInternalKeyForm ? (
           <>
@@ -195,8 +187,6 @@ export default function LoginForm({
           </button>
         )}
       </div>
-
-      {/* Copyright Disclaimer */}
       <footer className="copyright">
         Software propiedad de Santiago Haspert Piaggio. Todos los derechos reservados.
       </footer>
