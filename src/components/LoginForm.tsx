@@ -29,13 +29,13 @@ export default function LoginForm({
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  
+
   const [internalKey, setInternalKey] = useState("");
   const [internalPassword, setInternalPassword] = useState("");
   const [internalFirstName, setInternalFirstName] = useState("");
   const [internalLastName, setInternalLastName] = useState("");
   const [showInternalKeyForm, setShowInternalKeyForm] = useState(false);
-  
+
   const [isRegister, setIsRegister] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -71,7 +71,7 @@ export default function LoginForm({
   return (
     <div className="card">
       <div className="logo-container">
-        <img src="/logo.png" alt="Logo" className="logo" />
+        <img src="/logo-gold.png" alt="Logo" className="logo" />
         <h1 className="logo-title">Themis</h1>
         <h2 className="logo-subtitle">Asistente Legal</h2>
       </div>
@@ -116,7 +116,7 @@ export default function LoginForm({
           {isRegister ? "Registrarse" : "Iniciar Sesión"}
         </button>
       </form>
-      <div>
+      <div className="social-buttons">
         <button onClick={onGoogleLogin} className="btn btn-google">
           Iniciar sesión con Google
         </button>

@@ -1,20 +1,20 @@
 /* // src/components/LoginForm.css */
 
-/* Definición de variables para una paleta con mejor contraste */
+/* Definición de variables de color para una paleta de negros, grises y acentos champagne/beige */
 :root {
-  --primary-bg: #005fcc;           /* Azul oscuro para botones primarios */
-  --primary-bg-hover: #004a99;     /* Azul aún más oscuro en hover */
-  --secondary-bg: #404040;         /* Gris oscuro para botones secundarios */
-  --secondary-bg-hover: #333333;   /* Gris más oscuro en hover */
-  --google-bg: #db4437;            /* Rojo característico de Google */
-  --google-bg-hover: #c33d32;      /* Variante más oscura para hover */
-  --apple-bg: #000000;             /* Negro para Apple */
-  --apple-bg-hover: #222222;       /* Variante en hover */
-  --text-color: #1a1a1a;           /* Texto en color muy oscuro */
-  --card-bg: #ffffff;              /* Fondo blanco para tarjetas */
-  --body-bg: #f2f2f2;              /* Fondo gris claro para el body */
-  --input-bg: #ffffff;             /* Fondo blanco para los inputs */
-  --input-border: #777777;         /* Borde más oscuro para inputs */
+  --bg-color: #121212;                /* Fondo general */
+  --card-bg: #1e1e1e;                 /* Fondo de tarjetas, tono muy oscuro */
+  --text-color: #e0e0e0;              /* Texto principal, claro */
+  --input-bg: #2c2c2e;                /* Fondo de inputs */
+  --input-border: #3c3c3d;            /* Borde de inputs en gris oscuro */
+  
+  --btn-gradient-start: #1a1a1a;      /* Inicio del degradado de botones */
+  --btn-gradient-end: #2a2a2a;        /* Fin del degradado de botones */
+  --accent: #f7e7ce;                 /* Champagne/beige para acentos elegantes */
+  
+  --divider-color: #3c3c3d;
+  --link-color: var(--accent);
+  --link-hover-color: #d9c9b2;
 }
 
 /* Reset básico */
@@ -25,149 +25,157 @@
 }
 
 body {
-  font-family: sans-serif;
-  background-color: var(--body-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
   color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Estilo de la tarjeta */
+/* Tarjeta contenedora */
 .card {
   background-color: var(--card-bg);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
   max-width: 400px;
-  margin: 2rem auto;
+  width: 90%;
   padding: 2rem;
+  margin: 1rem;
 }
 
 /* Estilo del formulario */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
+/* Inputs */
 .input {
   border: 1px solid var(--input-border);
-  border-radius: 4px;
-  padding: 0.75rem;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
   font-size: 1rem;
   width: 100%;
   background-color: var(--input-bg);
+  color: var(--text-color);
+  transition: border 0.2s ease-in-out;
 }
 
-/* Estilos generales para botones */
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 5px var(--accent);
+}
+
+/* Botones Uniformes */
 .btn {
   border: none;
-  border-radius: 4px;
-  padding: 0.75rem;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background 0.3s ease, transform 0.2s ease;
   width: 100%;
   text-align: center;
+  background: linear-gradient(45deg, var(--btn-gradient-start), var(--btn-gradient-end));
+  color: var(--accent);
 }
 
-/* Botón primario */
-.btn-primary {
-  background-color: var(--primary-bg);
-  color: #ffffff;
+.btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(45deg, var(--btn-gradient-end), var(--btn-gradient-start));
 }
 
-.btn-primary:hover {
-  background-color: var(--primary-bg-hover);
-}
-
-/* Botón secundario */
+/* Botón secundario: ligera variación en el degradado */
 .btn-secondary {
-  background-color: var(--secondary-bg);
-  color: #ffffff;
+  background: linear-gradient(45deg, var(--btn-gradient-end), var(--btn-gradient-start));
 }
 
-.btn-secondary:hover {
-  background-color: var(--secondary-bg-hover);
+/* Botones para login con redes sociales: manteniendo congruencia en tamaño y forma */
+.btn-google {
+  background: linear-gradient(45deg, #3c3c3d, #4c4c4d);
+  color: var(--accent);
+}
+
+.btn-apple {
+  background: linear-gradient(45deg, #101010, #202020);
+  color: var(--accent);
+}
+
+.btn-google:hover,
+.btn-apple:hover {
+  transform: translateY(-2px);
 }
 
 /* Enlaces de texto */
 .text-link {
-  color: var(--primary-bg);
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--link-color);
   text-decoration: underline;
   cursor: pointer;
 }
 
 .text-link:hover {
-  color: var(--primary-bg-hover);
+  color: var(--link-hover-color);
 }
 
 /* Separador */
 .divider {
   margin: 2rem 0;
   border: none;
-  border-top: 1px solid var(--input-border);
+  border-top: 1px solid var(--divider-color);
 }
 
-/* Botones para login con redes sociales */
-.btn-google {
-  background-color: var(--google-bg);
-  color: #ffffff;
-  margin-bottom: 0.5rem;
-}
-
-.btn-google:hover {
-  background-color: var(--google-bg-hover);
-}
-
-.btn-apple {
-  background-color: var(--apple-bg);
-  color: #ffffff;
-}
-
-.btn-apple:hover {
-  background-color: var(--apple-bg-hover);
-}
-
-.card > * + * {
-  margin-top: 1rem;
-}
-
-.text-link {
-  background: none;
-  border: none;
-  padding: 0;
-  font: inherit;
-  color: var(--primary-bg);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.text-link:hover {
-  color: var(--primary-bg-hover);
-}
-
-/* Nuevas líneas para la sección de logo */
+/* Sección del logo */
 .logo-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .logo {
-  width: 150px;
+  width: 120px;
   height: auto;
   margin-bottom: 0.5rem;
 }
 
 .logo-title {
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 1.75rem;
+  font-weight: 600;
   margin: 0;
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent);  /* Efecto glow sutil */
 }
 
 .logo-subtitle {
-  font-size: 1rem;
+  font-size: 1.1rem;
   margin: 0;
+  color: var(--text-color);
 }
 
-/* Agrega esta línea a LoginForm.css */
-.copyright { text-align: center; font-size: 0.8rem; margin-top: 1rem; color: #888; }
+/* Espaciado interno en la tarjeta */
+.card > * + * {
+  margin-top: 1.25rem;
+}
+
+/* Pie de página */
+.copyright {
+  text-align: center;
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  color: #666666;
+}
+
+.social-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
