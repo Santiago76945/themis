@@ -16,18 +16,20 @@
     "mongoose": "^8.13.2",
     "next": "15.3.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "typeit": "^8.8.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/jquery": "^3.5.32",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.0",
+    "netlify-cli": "^15.8.0",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "netlify-cli": "^15.8.0"
+    "typescript": "^5"
   }
 }
