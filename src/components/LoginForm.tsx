@@ -3,11 +3,17 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import "./LoginForm.css";
 
 interface LoginFormProps {
   onLogin: (identifier: string, password: string) => Promise<void>;
-  onInternalKeyCreate: (internalKey: string, internalPassword: string, firstName: string, lastName: string) => Promise<void>;
+  onInternalKeyCreate: (
+    internalKey: string,
+    internalPassword: string,
+    firstName: string,
+    lastName: string
+  ) => Promise<void>;
   onGoogleLogin: () => Promise<void>;
   onAppleLogin: () => Promise<void>;
   onRegister: (
@@ -29,13 +35,11 @@ export default function LoginForm({
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-
   const [internalKey, setInternalKey] = useState("");
   const [internalPassword, setInternalPassword] = useState("");
   const [internalFirstName, setInternalFirstName] = useState("");
   const [internalLastName, setInternalLastName] = useState("");
   const [showInternalKeyForm, setShowInternalKeyForm] = useState(false);
-
   const [isRegister, setIsRegister] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -64,14 +68,19 @@ export default function LoginForm({
       alert("Por favor ingresa una contraseña para tu cuenta interna");
       return;
     }
-    console.log("Llamando onInternalKeyCreate con los datos internos:", { internalKey, internalPassword, internalFirstName, internalLastName });
+    console.log("Llamando onInternalKeyCreate con los datos internos:", {
+      internalKey,
+      internalPassword,
+      internalFirstName,
+      internalLastName,
+    });
     await onInternalKeyCreate(internalKey, internalPassword, internalFirstName, internalLastName);
   };
 
   return (
     <div className="card">
       <div className="logo-container">
-        <img src="/logo-gold.png" alt="Logo" className="logo" />
+        <Image src="/logo-gold.png" alt="Logo" width={200} height={200} className="logo" />
         <h1 className="logo-title">Themis</h1>
         <h2 className="logo-subtitle">Asistente Legal</h2>
       </div>

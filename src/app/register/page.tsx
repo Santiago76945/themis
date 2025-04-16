@@ -18,23 +18,14 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const userCredential = await signUpWithEmail(email, password);
+      await signUpWithEmail(email, password);
       const auth = getAuth();
       const user = auth.currentUser;
       if (user) {
-        // Generar el código de usuario único
         const uniqueCode = generateUniqueCode();
-
-        // Actualizar el perfil del usuario (por ejemplo, displayName)
         await updateProfile(user, {
           displayName: `${firstName} ${lastName}`,
         });
-
-        // Aquí deberías almacenar en tu base de datos adicional:
-        // - firstName
-        // - lastName
-        // - uniqueCode
-        // (podrías hacer una llamada a tu API o a tu función en MongoDB)
         console.log("Datos de registro almacenados:", {
           uid: user.uid,
           firstName,

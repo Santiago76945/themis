@@ -51,7 +51,6 @@ export default function LoginPage() {
         return;
       }
     }
-    // Autentica usando signInWithEmail con el email obtenido y la contraseña ingresada
     try {
       console.log("Iniciando sesión con email:", loginEmail);
       await signInWithEmail(loginEmail, password);
@@ -61,16 +60,6 @@ export default function LoginPage() {
       const errMsg = error instanceof Error ? error.message : String(error);
       console.error("Error en signInWithEmail:", errMsg);
       alert("Ocurrió un error al iniciar sesión: " + errMsg);
-    }
-  };
-
-  const handleGuestAccess = async (guestPassword: string) => {
-    console.log("Intento de acceso como invitado.");
-    if (guestPassword === process.env.NEXT_PUBLIC_GUEST_PASSWORD) {
-      console.log("Acceso de desarrollador concedido");
-      router.push("/menu");
-    } else {
-      alert("Contraseña incorrecta para acceso sin iniciar sesión.");
     }
   };
 
@@ -160,7 +149,6 @@ export default function LoginPage() {
       try {
         console.log("Clave interna correcta. Generando credenciales internas.");
         const email = `internal_${Date.now()}@themis.com`;
-        // Se usa la contraseña ingresada en el formulario
         await signUpWithEmail(email, internalPassword);
         const auth = getAuth();
         const currentUser = auth.currentUser;
@@ -198,7 +186,6 @@ export default function LoginPage() {
           console.error("No se obtuvo el usuario actual después del registro interno.");
           throw new Error("Usuario no autenticado.");
         }
-        // Forzar la recarga del usuario para obtener displayName actualizado
         if (getAuth().currentUser) {
           await getAuth().currentUser!.reload();
         }

@@ -3,7 +3,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut, User } from "firebase/auth";
 import { app } from "@/lib/firebase";
 import { fetchUserProfileFromMongo } from "@/lib/firebaseUser";
 
@@ -17,7 +17,7 @@ interface UserData {
 }
 
 interface AuthContextProps {
-  user: any;
+  user: User | null;
   userData: UserData | null;
   logout: () => Promise<void>;
 }
@@ -29,11 +29,11 @@ const AuthContext = createContext<AuthContextProps>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const auth = getAuth(app);
 
-  // Este ref nos permite saber si ya se obtuvo la info extendida desde Mongo.
+  // Este ref nos permite saber si ya se obtuvo la información extendida de Mongo.
   const extendedProfileRef = useRef<UserData | null>(null);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Recargar para obtener datos actualizados
         await currentUser.reload();
         console.log("AuthContext - Usuario después de reload:", currentUser);
-        // Si aún no se obtuvo la info extendida, hacemos la consulta a MongoDB.
+        // Si aún no se obtuvo la información extendida, hacemos la consulta a MongoDB.
         if (!extendedProfileRef.current) {
           const mongoProfile = await fetchUserProfileFromMongo(currentUser.uid);
           if (mongoProfile && mongoProfile.firstName && mongoProfile.lastName) {
@@ -72,7 +72,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             extendedProfileRef.current = newData;
           }
         } else {
-          // Si ya se obtuvo la info extendida, no la sobreescribimos.
           console.log("AuthContext - Usando info extendida previamente obtenida:", extendedProfileRef.current);
         }
       } else {
@@ -84,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, [auth]);
 
-  // Para observar cambios en userData (note que el log aquí puede verse con retardo por el nature de setState)
+  // Observar cambios en userData para depuración
   useEffect(() => {
     console.log("AuthContext - userData actual:", userData);
   }, [userData]);

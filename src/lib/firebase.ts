@@ -1,6 +1,7 @@
 // src/lib/firebase.ts
 
 import { initializeApp, getApps, getApp } from "firebase/app";
+import type { Analytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
@@ -15,9 +16,9 @@ const firebaseConfig = {
 // Evitar múltiples inicializaciones
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-let analytics: any = null;
+let analytics: Analytics | null = null;
 
-// Solo se inicializa Analytics en el cliente, donde existe el objeto window
+// Inicializar Analytics solo en el cliente
 if (typeof window !== "undefined") {
   import("firebase/analytics")
     .then(({ getAnalytics, isSupported }) => {
@@ -27,11 +28,11 @@ if (typeof window !== "undefined") {
             analytics = getAnalytics(app);
           }
         })
-        .catch((err) => {
+        .catch((err: Error) => {
           console.error("Firebase Analytics no es compatible:", err);
         });
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       console.error("Error al importar firebase/analytics:", err);
     });
 }

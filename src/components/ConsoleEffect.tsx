@@ -5,6 +5,17 @@
 import { useEffect, useRef } from "react";
 import animatedTexts from "./animatedTexts.json";
 
+// Declaraciones mínimas para jQuery
+interface JQuery {
+  typeIt: (options: { strings: string[]; speed: number; autoStart: boolean }) => void;
+}
+interface JQueryStatic {
+  (selector: string): JQuery;
+  fn: {
+    typeIt: (options: { strings: string[]; speed: number; autoStart: boolean }) => void;
+  };
+}
+
 export default function ConsoleEffect() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -16,10 +27,11 @@ export default function ConsoleEffect() {
   };
 
   useEffect(() => {
-    const $ = (window as any).$;
-    const timeoutIds: ReturnType<typeof setTimeout>[] = []; // Guardamos los IDs de los timeouts
+    // Se castea "window" para acceder a la propiedad "$"
+    const $ = (window as unknown as { $?: JQueryStatic }).$;
+    const timeoutIds: ReturnType<typeof setTimeout>[] = [];
 
-    // Configuramos un MutationObserver para detectar cambios en el contenedor
+    // MutationObserver para detectar cambios en el contenedor y hacer scroll
     const observer = new MutationObserver(() => {
       scrollToBottom();
     });
@@ -31,8 +43,8 @@ export default function ConsoleEffect() {
       });
     }
 
-    // Configuración de TypeIt para cada línea de texto
-    if (typeof window !== "undefined" && $ && $.fn.typeIt) {
+    // Configurar TypeIt para cada línea de texto si la función está disponible
+    if (typeof window !== "undefined" && $ && typeof $.fn.typeIt === "function") {
       animatedTexts.forEach((text, index) => {
         const delay = index * 4444;
         const timeoutId = setTimeout(() => {
@@ -42,11 +54,11 @@ export default function ConsoleEffect() {
             autoStart: true,
           });
         }, delay);
-        timeoutIds.push(timeoutId); // Almacenamos el ID del timeout
+        timeoutIds.push(timeoutId);
       });
     }
 
-    // Limpiamos el observer y los timeouts al desmontar el componente
+    // Limpiar observer y timeouts al desmontar el componente
     return () => {
       observer.disconnect();
       timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
