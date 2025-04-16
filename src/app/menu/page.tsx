@@ -21,10 +21,16 @@ export default function MenuPage() {
     router.push("/login");
   };
 
+  // Si existen tanto firstName como lastName, se combinan; de lo contrario se usa firstName o "Usuario" como fallback.
+  const fullName =
+    userData?.firstName && userData?.lastName
+      ? `${userData.firstName} ${userData.lastName}`
+      : userData?.firstName || "Usuario";
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <h1 className="text-2xl font-bold mb-4">
-        Hola, {userData?.firstName || "Usuario"}
+        Hola, {fullName}
       </h1>
       <p className="mb-8">
         Tu código de usuario es: <strong>{userData?.uniqueCode}</strong>
