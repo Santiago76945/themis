@@ -17,6 +17,7 @@ export default function ConsoleEffect() {
 
   useEffect(() => {
     const $ = (window as any).$;
+    const timeoutIds: ReturnType<typeof setTimeout>[] = []; // Guardamos los IDs de los timeouts
 
     // Configuramos un MutationObserver para detectar cambios en el contenedor
     const observer = new MutationObserver(() => {
@@ -34,21 +35,21 @@ export default function ConsoleEffect() {
     if (typeof window !== "undefined" && $ && $.fn.typeIt) {
       animatedTexts.forEach((text, index) => {
         const delay = index * 4444;
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
           $(`#element-${index}`).typeIt({
             strings: [text],
             speed: 80,
             autoStart: true,
-            // Si el plugin lo soporta, también se podría usar un callback aquí:
-            // afterComplete: scrollToBottom
           });
         }, delay);
+        timeoutIds.push(timeoutId); // Almacenamos el ID del timeout
       });
     }
 
-    // Limpiamos el observer al desmontar el componente
+    // Limpiamos el observer y los timeouts al desmontar el componente
     return () => {
       observer.disconnect();
+      timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
     };
   }, []);
 

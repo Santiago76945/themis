@@ -4,7 +4,8 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { app } from "@/lib/firebase"; // Importa la app ya inicializada
+import { app } from "@/lib/firebase"; // App ya inicializada de Firebase
+import { fetchUserProfileFromMongo } from "@/lib/firebaseUser";
 
 interface UserData {
   uid: string;
@@ -29,19 +30,32 @@ const AuthContext = createContext<AuthContextProps>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<any>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const auth = getAuth(app); // Se utiliza la instancia inicializada de Firebase
+  const auth = getAuth(app);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        setUserData({
-          uid: currentUser.uid,
-          email: currentUser.email || "",
-          displayName: currentUser.displayName || "",
-          firstName: currentUser.displayName?.split(" ")[0] || "",
-          uniqueCode: "ABC123", // Reemplaza por el valor real o consulta tu base de datos
-        });
+        // Intenta obtener el perfil extendido desde MongoDB
+        const mongoProfile = await fetchUserProfileFromMongo(currentUser.uid);
+        if (mongoProfile) {
+          setUserData({
+            uid: mongoProfile.uid,
+            email: mongoProfile.email,
+            displayName: currentUser.displayName || `${mongoProfile.firstName} ${mongoProfile.lastName}`,
+            firstName: mongoProfile.firstName,
+            uniqueCode: mongoProfile.uniqueCode,
+          });
+        } else {
+          // Fallback a la información básica de Firebase
+          setUserData({
+            uid: currentUser.uid,
+            email: currentUser.email || "",
+            displayName: currentUser.displayName || "",
+            firstName: currentUser.displayName?.split(" ")[0] || "",
+            uniqueCode: currentUser.uid.slice(-6).toUpperCase(),
+          });
+        }
       } else {
         setUserData(null);
       }

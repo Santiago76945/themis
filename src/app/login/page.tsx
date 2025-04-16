@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LoginForm from "@/components/LoginForm";
 import { useAuth } from "@/context/AuthContext";
-import { signInWithApple, signInWithGoogle, signUpWithEmail } from "@/lib/firebaseAuth";
+import { signInWithApple, signInWithGoogle, signUpWithEmail, signInWithEmail } from "@/lib/firebaseAuth";
 import { updateProfile, getAuth } from "firebase/auth";
 import { generateUniqueCode } from "@/utils/generateCode";
 
@@ -51,8 +51,17 @@ export default function LoginPage() {
         return;
       }
     }
-    console.log("Procediendo con login con email:", loginEmail);
-    router.push("/menu");
+    // Autentica usando signInWithEmail con el email obtenido y la contraseña ingresada
+    try {
+      console.log("Iniciando sesión con email:", loginEmail);
+      await signInWithEmail(loginEmail, password);
+      console.log("Inicio de sesión exitoso. Redireccionando a /menu.");
+      router.push("/menu");
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      console.error("Error en signInWithEmail:", errMsg);
+      alert("Ocurrió un error al iniciar sesión: " + errMsg);
+    }
   };
 
   const handleGuestAccess = async (guestPassword: string) => {
@@ -117,9 +126,7 @@ export default function LoginPage() {
         console.log("Enviando perfil a la nube:", userProfile);
         const response = await fetch("/.netlify/functions/createUserProfile", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(userProfile),
         });
         if (!response.ok) {
@@ -142,36 +149,42 @@ export default function LoginPage() {
     }
   };
 
-  const handleInternalKeyCreate = async (internalKey: string) => {
+  const handleInternalKeyCreate = async (
+    internalKey: string,
+    internalPassword: string,
+    internalFirstName: string,
+    internalLastName: string
+  ) => {
     console.log("Inicio de proceso de creación de usuario con clave interna.");
     if (internalKey === process.env.NEXT_PUBLIC_INTERNAL_KEY) {
       try {
         console.log("Clave interna correcta. Generando credenciales internas.");
         const email = `internal_${Date.now()}@themis.com`;
-        const password = Math.random().toString(36).slice(-8);
-        await signUpWithEmail(email, password);
+        // Se usa la contraseña ingresada en el formulario
+        await signUpWithEmail(email, internalPassword);
         const auth = getAuth();
         const currentUser = auth.currentUser;
         if (currentUser) {
           const uniqueCode = generateUniqueCode();
-          console.log("Usuario interno registrado. Actualizando perfil en Firebase con displayName:", `Usuario Interno (${uniqueCode})`);
+          console.log(
+            "Usuario interno registrado. Actualizando perfil en Firebase con displayName:",
+            `${internalFirstName} ${internalLastName} (${uniqueCode})`
+          );
           await updateProfile(currentUser, {
-            displayName: `Usuario Interno (${uniqueCode})`,
+            displayName: `${internalFirstName} ${internalLastName} (${uniqueCode})`,
           });
           const userProfile = {
             uid: currentUser.uid,
             email: currentUser.email,
-            firstName: "Interno",
-            lastName: "Usuario",
+            firstName: internalFirstName,
+            lastName: internalLastName,
             uniqueCode,
             registrationMethod: "internal",
           };
           console.log("Enviando perfil interno a la nube:", userProfile);
           const response = await fetch("/.netlify/functions/createUserProfile", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userProfile),
           });
           if (!response.ok) {
@@ -184,6 +197,10 @@ export default function LoginPage() {
         } else {
           console.error("No se obtuvo el usuario actual después del registro interno.");
           throw new Error("Usuario no autenticado.");
+        }
+        // Forzar la recarga del usuario para obtener displayName actualizado
+        if (getAuth().currentUser) {
+          await getAuth().currentUser!.reload();
         }
         console.log("Usuario interno creado correctamente. Redireccionando a /menu.");
         router.push("/menu");

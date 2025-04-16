@@ -5,6 +5,7 @@ themis-legal-assistant/
 │   └── functions/
 │       ├── auth.ts
 │       ├── createUserProfile.ts
+│       ├── getUserProfile.ts
 │       ├── db.ts
 │       └── getUserEmailByUniqueCode.ts
 ├── .next/                         # Archivos generados por Next.js (ignorar/oculto)

@@ -4,29 +4,23 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { fetchFirebaseUserData } from "@/lib/firebaseUser";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Menu() {
+  const { userData } = useAuth();
   const [userInfo, setUserInfo] = useState({
     displayName: "Usuario",
     uniqueCode: "SINCOD",
   });
 
   useEffect(() => {
-    async function getUserData() {
-      const data = await fetchFirebaseUserData();
-      if (data && data.displayName) {
-        // Si no tienes almacenado el uniqueCode en Firebase, 
-        // se puede derivar (por ejemplo, tomando los últimos 6 dígitos del UID)
-        const computedUniqueCode = data.uid.slice(-6).toUpperCase();
-        setUserInfo({
-          displayName: data.displayName,
-          uniqueCode: computedUniqueCode,
-        });
-      }
+    if (userData) {
+      setUserInfo({
+        displayName: userData.displayName || "Usuario",
+        uniqueCode: userData.uniqueCode || "SINCOD",
+      });
     }
-    getUserData();
-  }, []);
+  }, [userData]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -39,7 +33,7 @@ export default function Menu() {
         <button className="mt-2 text-blue-500 hover:underline">Cerrar sesión</button>
       </header>
 
-      {/* Botones principales: se muestran siempre, incluso si aún no tienen funcionalidad */}
+      {/* Botones principales */}
       <nav className="grid grid-cols-2 gap-4">
         <Link href="/menu">
           <a className="p-4 bg-white shadow rounded hover:bg-gray-100">Inicio</a>

@@ -16,3 +16,19 @@ export async function fetchFirebaseUserData() {
   }
   return null;
 }
+
+export async function fetchUserProfileFromMongo(uid: string) {
+  try {
+    const response = await fetch(`/.netlify/functions/getUserProfile?uid=${uid}`);
+    if (response.ok) {
+      const data = await response.json();
+      return data.profile;
+    } else {
+      console.error("Error fetching profile from MongoDB:", await response.text());
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching profile from MongoDB:", error);
+    return null;
+  }
+}
