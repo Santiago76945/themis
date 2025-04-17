@@ -24,26 +24,35 @@ export default function LoginPage() {
   const handleLogin = async (identifier: string, password: string) => {
     console.log("Inicio de proceso de login con identifier:", identifier);
     let loginEmail = identifier;
+
     if (!identifier.includes("@")) {
       if (!/^[A-Za-z0-9]{6}$/.test(identifier)) {
         alert("ID de usuario inválido. Debe ser 6 caracteres alfanuméricos.");
         return;
       }
+
       try {
         console.log("Consultando endpoint para obtener email por ID:", identifier);
         const response = await fetch(`/.netlify/functions/getUserEmailByUniqueCode?uniqueCode=${identifier}`);
-        const data = await response.json();
+
         if (!response.ok) {
-          console.error("Error al obtener email por ID:", data);
-          alert(data.error || "Error al obtener el correo asociado a este ID.");
+          // Leemos como texto para no romper con JSON inválido
+          const errorText = await response.text();
+          console.error("Error al obtener email por ID:", errorText);
+          alert(errorText || "Error al obtener el correo asociado a este ID.");
           return;
         }
+
+        // Sólo intentamos parsear JSON si status es OK
+        const data = await response.json();
         if (data.registrationMethod === "apple" || data.registrationMethod === "google") {
           alert("Los usuarios que se registraron con Apple o Google deben iniciar sesión con su correo electrónico.");
           return;
         }
+
         loginEmail = data.email;
         console.log("Email obtenido para login:", loginEmail);
+
       } catch (error: unknown) {
         const errMsg = error instanceof Error ? error.message : String(error);
         console.error("Error en fetch para obtener email por ID:", errMsg);
@@ -51,6 +60,7 @@ export default function LoginPage() {
         return;
       }
     }
+
     try {
       console.log("Iniciando sesión con email:", loginEmail);
       await signInWithEmail(loginEmail, password);
@@ -100,7 +110,10 @@ export default function LoginPage() {
       const currentUser = auth.currentUser;
       if (currentUser) {
         const uniqueCode = generateUniqueCode();
-        console.log("Usuario registrado. Actualizando perfil en Firebase con displayName:", `${firstName} ${lastName}`);
+        console.log(
+          "Usuario registrado. Actualizando perfil en Firebase con displayName:",
+          `${firstName} ${lastName}`
+        );
         await updateProfile(currentUser, {
           displayName: `${firstName} ${lastName}`,
         });
@@ -213,3 +226,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

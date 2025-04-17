@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import "./LoginForm.css";
+import "@/styles/LoginForm.css";
 
 interface LoginFormProps {
   onLogin: (identifier: string, password: string) => Promise<void>;
