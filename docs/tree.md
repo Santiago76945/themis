@@ -1,22 +1,25 @@
-tree.md
-
 themis-legal-assistant/
-├── .netlify/                      # (Netlify-specific build/config directory)
+├── .netlify/                      # Configuración y funciones Netlify
 │   └── functions/
 │       ├── auth.ts
+│       ├── createLawFirm.ts          # Nuevo: crea estudios jurídicos
 │       ├── createUserProfile.ts
+│       ├── getInvitations.ts         # Nuevo: obtiene invitaciones pendientes
+│       ├── getMyLawFirm.ts           # Nuevo: obtiene datos del estudio del usuario
+│       ├── getUserEmailByUniqueCode.ts
 │       ├── getUserProfile.ts
-│       ├── db.ts
-│       └── getUserEmailByUniqueCode.ts
+│       ├── inviteToLawFirm.ts        # Nuevo: envía invitaciones a usuarios
+│       ├── respondInvitation.ts      # Nuevo: responde invitaciones (aceptar/rechazar)
+│       └── db.ts
 ├── .next/                         # Archivos generados por Next.js (ignorar/oculto)
 ├── docs/
 │   ├── etapas-de-desarrollo.md
 │   ├── funciones.md
 │   ├── main-menu.md
 │   ├── roles.md
-│   └── tree.md
+│   └── tree.md                    # Este archivo
 ├── netlify/
-│   └── functions/                # (Puede estar fusionado con .netlify/)
+│   └── functions/                # (Puede fusionarse con .netlify/functions)
 ├── node_modules/                 # Dependencias instaladas (ignorar/oculto)
 ├── public/
 │   ├── file.svg
@@ -26,7 +29,7 @@ themis-legal-assistant/
 │   ├── logo-white.png
 │   ├── logo.png
 │   ├── next.svg
-│   ├── old-logo.png              # Nuevo
+│   ├── old-logo.png              # Nuevo recurso
 │   ├── vercel.svg
 │   └── window.svg
 ├── src/
@@ -35,31 +38,34 @@ themis-legal-assistant/
 │   │   │   └── page.tsx
 │   │   ├── menu/
 │   │   │   ├── mi-estudio/
-│   │   │   │   └── page.tsx
-│   │   │   └── page.tsx
+│   │   │   │   └── page.tsx      # MyLawFirm en App Router
+│   │   │   └── page.tsx          # Menu principal
 │   │   ├── register/
 │   │   │   └── page.tsx
 │   │   ├── favicon.ico
-│   │   ├── globals.css
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── components/
-│   │   ├── animatedTexts.json     # Nuevo: textos animados para UI
-│   │   ├── ConsoleEffect.tsx      # Nuevo: efecto consola para el dashboard
-│   │   ├── ConsoleEffectWrapper.tsx  # Nuevo: contenedor para efectos de consola
-│   │   ├── LoginForm.css          # Nuevo: estilos sueltos para el formulario
+│   │   ├── animatedTexts.json
+│   │   ├── ConsoleEffect.tsx
+│   │   ├── ConsoleEffectWrapper.tsx
 │   │   ├── LoginForm.tsx
 │   │   ├── Menu.tsx
-│   │   └── MyLawFirm.tsx
+│   │   └── MyLawFirm.tsx         # Componente de gestión de estudio
 │   ├── context/
 │   │   └── AuthContext.tsx
 │   ├── lib/
 │   │   ├── firebase.ts
 │   │   ├── firebaseAuth.ts
 │   │   ├── firebaseUser.ts
-│   │   └── mongoose.ts
+│   │   ├── mongoose.ts
+│   │   └── models/                # Nuevos modelos Mongoose
+│   │       ├── LawFirm.ts
+│   │       └── Invitation.ts
 │   ├── styles/
-│   │   └── global.css
+│   │   ├── global.css            # Estilos globales (Tailwind o similares)
+│   │   ├── LoginForm.css         # Estilos para LoginForm
+│   │   └── Menu.css              # Estilos para Menu
 │   └── utils/
 │       └── generateCode.ts
 ├── .env.local
