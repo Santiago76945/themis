@@ -3,20 +3,38 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import "@/styles/Menu.css";
+import Image from "next/image";
+import styles from "@/styles/Menu.module.css";
 
 interface Invitation {
   _id: string;
   lawFirmCode: string;
 }
 
-export default function Menu({ onLogout }: { onLogout: () => void }) {
-  const { userData } = useAuth();
+interface MenuItem {
+  label: string;
+  icon: string;
+  path?: string;
+  enabled: boolean;
+}
+
+// Defino aquí el shape de UserData que espero recibir
+interface UserData {
+  uniqueCode?: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+}
+
+interface MenuProps {
+  userData: UserData | null;
+  onLogout: () => void;
+}
+
+export default function Menu({ userData, onLogout }: MenuProps) {
   const userCode = userData?.uniqueCode || "";
   const router = useRouter();
-
   const [invitations, setInvitations] = useState<Invitation[]>([]);
 
   useEffect(() => {
@@ -40,51 +58,45 @@ export default function Menu({ onLogout }: { onLogout: () => void }) {
       : userData.displayName
     : "Usuario";
 
-  const menuItems = [
-    "Mi estudio jurídico",
-    "Finanzas del estudio",
-    "Gestión de expedientes",
-    "Gestión de clientes",
-    "Agenda y audiencias",
-    "Actualización de estados procesales",
-    "Mapa de pruebas",
-    "Creación de escritos",
-    "Cartas documento y telegramas",
-    "Reportes y estadísticas",
-    "Gestión de usuarios y roles",
+  const menuItems: MenuItem[] = [
+    { label: "Mi estudio jurídico", icon: "/icons/office-icon.png", path: "/menu/mi-estudio", enabled: true },
+    { label: "Gestión de clientes", icon: "/icons/clients-icon.png", enabled: false },
+    { label: "Finanzas del estudio", icon: "/icons/finances-icon.png", enabled: false },
+    { label: "Gestión de expedientes", icon: "/icons/court-file-icon.png", enabled: false },
+    { label: "Agenda y audiencias", icon: "/icons/calendar-icon.png", enabled: false },
+    { label: "Actualización de estados procesales", icon: "/icons/notifications-icon.png", enabled: false },
+    { label: "Mapa de pruebas", icon: "/icons/folder-icon.png", enabled: false },
+    { label: "Creación de escritos", icon: "/icons/logo-redaccion.png", enabled: false },
+    { label: "Cartas documento y telegramas", icon: "/icons/logo-tareas.png", enabled: false },
+    { label: "Reportes y estadísticas", icon: "/icons/report-icon.png", enabled: false },
+    { label: "Gestión de usuarios y roles", icon: "/icons/users-icon.png", enabled: false },
   ];
 
   return (
     <div className="container">
-      <div className="card menu-card">
-        <header className="menu-header">
-          <h1 className="menu-title">Dashboard</h1>
-          <p className="menu-subtitle">
+      <div className={`card ${styles.menuCard}`}>
+        <header className={styles.menuHeader}>
+          <h1 className={styles.menuTitle}>Dashboard</h1>
+          <p className={styles.menuSubtitle}>
             ¡Hola, {fullName}!<br />
             Tu código de usuario es: <strong>{userCode || "SINCOD"}</strong>
           </p>
-          <button className="btn styled-logout" onClick={onLogout}>
+          <button className="btn btn-link" onClick={onLogout}>
             Cerrar sesión
           </button>
         </header>
 
         {invitations.length > 0 && (
-          <div className="card invitations-card">
-            <h3 className="invitation-header">Invitaciones pendientes</h3>
+          <div className={`card-secondary ${styles.invitationsCard}`}>
+            <h3 className={styles.invitationHeader}>Invitaciones pendientes</h3>
             {invitations.map((inv) => (
-              <div key={inv._id} className="invitation-item">
+              <div key={inv._id} className={styles.invitationItem}>
                 <span>Estudio {inv.lawFirmCode}</span>
-                <div className="invitation-actions">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => handleRespond(inv._id, "accepted")}
-                  >
+                <div className={styles.invitationActions}>
+                  <button className="btn btn-primary" onClick={() => handleRespond(inv._id, "accepted")}>
                     Aceptar
                   </button>
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => handleRespond(inv._id, "rejected")}
-                  >
+                  <button className="btn btn-secondary" onClick={() => handleRespond(inv._id, "rejected")}>
                     Rechazar
                   </button>
                 </div>
@@ -93,21 +105,22 @@ export default function Menu({ onLogout }: { onLogout: () => void }) {
           </div>
         )}
 
-        <nav className="menu-nav">
+        <nav className={styles.menuNav}>
           {menuItems.map((item, idx) => (
-            <div key={item} className="menu-item">
-              {idx > 0 && <div className="badge">Próximamente</div>}
+            <div key={idx} className={styles.menuItem}>
               <button
-                className="btn menu-button"
-                disabled={idx !== 0}
-                onClick={() => idx === 0 && router.push("/menu/mi-estudio")}
+                className={`btn ${styles.menuButton}`}
+                disabled={!item.enabled}
+                onClick={() => item.enabled && item.path && router.push(item.path)}
               >
-                {item}
+                <Image src={item.icon} alt={`${item.label} icon`} width={48} height={48} className={styles.icon} />
+                <span className={styles.menuLabel}>{item.label}</span>
+                {!item.enabled && <div className={styles.badge}>Próximamente</div>}
               </button>
             </div>
           ))}
         </nav>
       </div>
     </div>
-);
+  );
 }

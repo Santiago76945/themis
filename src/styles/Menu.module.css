@@ -1,0 +1,103 @@
+/* src/styles/Menu.module.css */
+
+/* Header del Dashboard */
+.menuHeader {
+  border: 2px solid var(--color-accent);
+  border-radius: 8px;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  text-align: center;
+}
+
+/* Título y subtítulo */
+.menuTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  margin-bottom: var(--space-2);
+}
+.menuSubtitle {
+  font-size: var(--font-size-lg);
+  line-height: 1.4;
+  color: var(--color-on-surface);
+}
+
+/* Sub‑card de invitaciones pendientes */
+.invitationsCard {
+  margin-bottom: var(--space-4);
+}
+
+/* Grid responsivo de ítems */
+.menuNav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Contenedor de cada ítem */
+.menuItem {
+  text-align: center;
+}
+
+/* Botón de cada ítem: vertical, centrado */
+.menuButton {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-surface);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  color: var(--color-on-surface);
+  font-size: var(--font-size-base);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* Icono dentro del botón */
+.icon {
+  width: 48px;
+  height: 48px;
+  filter: brightness(0) invert(1);
+  margin-bottom: var(--space-2);
+}
+
+/* Etiqueta de texto bajo el icono */
+.menuLabel {
+  margin-top: var(--space-1);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-surface);
+}
+
+/* Badge ‘Próximamente’ */
+.badge {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  background: #e63946;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* Estados del botón */
+.menuButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.menuButton:not(:disabled):hover {
+  background: var(--gradient-end);
+  transform: translateY(-2px);
+}
+
+/* Ajustes móviles */
+@media (max-width: var(--breakpoint-md)) {
+  .menuNav {
+    gap: var(--space-3);
+  }
+}
+
+

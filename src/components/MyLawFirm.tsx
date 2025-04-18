@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import "@/styles/MyLawFirm.css";
+import styles from "@/styles/MyLawFirm.module.css";
 
 interface LawFirm {
   name: string;
@@ -38,6 +38,7 @@ export default function MyLawFirm() {
 
   const isManager = firm?.managerCode === userCode;
 
+  // Carga los datos del estudio y las invitaciones al montar
   useEffect(() => {
     if (!userCode) return;
     fetch(`/.netlify/functions/getMyLawFirm?userCode=${userCode}`)
@@ -49,6 +50,7 @@ export default function MyLawFirm() {
       .then((data) => setPendingInvites(data.invites || []));
   }, [userCode]);
 
+  // Carga perfiles de los miembros
   useEffect(() => {
     if (!firm) return;
     firm.members.forEach((code) => {
@@ -68,7 +70,10 @@ export default function MyLawFirm() {
   }, [firm, memberProfiles]);
 
   const createFirm = () => {
-    if (!newFirmName.trim()) return alert("Ingresá un nombre para el estudio.");
+    if (!newFirmName.trim()) {
+      alert("Ingresá un nombre para el estudio.");
+      return;
+    }
     fetch("/.netlify/functions/createLawFirm", {
       method: "POST",
       body: JSON.stringify({ name: newFirmName, managerCode: userCode }),
@@ -113,11 +118,11 @@ export default function MyLawFirm() {
 
   return (
     <div className="container">
-      <div className="card mylawfirm-card">
+      <div className={`card ${styles.mylawfirmCard}`}>
         {!firm ? (
-          <section className="create-firm-section">
-            <h2 className="section-title">Crear Estudio Jurídico</h2>
-            <div className="form-row">
+          <section>
+            <h2 className={styles.sectionTitle}>Crear Estudio Jurídico</h2>
+            <div className={styles.formRow}>
               <input
                 type="text"
                 value={newFirmName}
@@ -131,12 +136,12 @@ export default function MyLawFirm() {
             </div>
 
             {pendingInvites.length > 0 && (
-              <div className="card invites-section">
-                <h3 className="section-subtitle">Tus invitaciones</h3>
+              <div className="card-secondary">
+                <h3 className={styles.sectionSubtitle}>Tus invitaciones</h3>
                 {pendingInvites.map((inv) => (
-                  <div key={inv._id} className="invitation-item">
+                  <div key={inv._id} className={styles.invitationItem}>
                     <span>{inv.lawFirmCode}</span>
-                    <div className="invitation-actions">
+                    <div className={styles.invitationActions}>
                       <button
                         className="btn btn-primary"
                         onClick={() => respondInvite(inv._id, "accepted")}
@@ -157,8 +162,8 @@ export default function MyLawFirm() {
           </section>
         ) : (
           <>
-            <section className="firm-details-section">
-              <h2 className="section-title">Mi Estudio Jurídico</h2>
+            <section>
+              <h2 className={styles.sectionTitle}>Mi Estudio Jurídico</h2>
               <p>
                 <strong>Nombre:</strong> {firm.name}
               </p>
@@ -168,9 +173,9 @@ export default function MyLawFirm() {
             </section>
 
             {isManager && (
-              <div className="card invite-section">
-                <h3 className="section-subtitle">Invitar abogado</h3>
-                <div className="form-row">
+              <div className="card-secondary">
+                <h3 className={styles.sectionSubtitle}>Invitar abogado</h3>
+                <div className={styles.formRow}>
                   <input
                     type="text"
                     value={inviteCode}
@@ -186,12 +191,14 @@ export default function MyLawFirm() {
             )}
 
             {pendingInvites.length > 0 && (
-              <div className="card invites-section">
-                <h3 className="section-subtitle">Invitaciones pendientes</h3>
+              <div className="card-secondary">
+                <h3 className={styles.sectionSubtitle}>
+                  Invitaciones pendientes
+                </h3>
                 {pendingInvites.map((inv) => (
-                  <div key={inv._id} className="invitation-item">
+                  <div key={inv._id} className={styles.invitationItem}>
                     <span>{inv.lawFirmCode}</span>
-                    <div className="invitation-actions">
+                    <div className={styles.invitationActions}>
                       <button
                         className="btn btn-primary"
                         onClick={() => respondInvite(inv._id, "accepted")}
@@ -210,11 +217,11 @@ export default function MyLawFirm() {
               </div>
             )}
 
-            <div className="card members-section">
-              <h3 className="section-subtitle">Miembros</h3>
-              <ul className="members-list">
+            <div className="card-secondary">
+              <h3 className={styles.sectionSubtitle}>Miembros</h3>
+              <ul className={styles.membersList}>
                 {firm.members.map((m) => (
-                  <li key={m} className="member-item">
+                  <li key={m} className={styles.memberItem}>
                     <span>
                       {memberProfiles[m]
                         ? `${memberProfiles[m].firstName} ${memberProfiles[m].lastName} (ID: ${m})`
@@ -235,7 +242,7 @@ export default function MyLawFirm() {
 
             {isManager && (
               <button
-                className="btn btn-secondary delete-btn"
+                className="btn btn-secondary"
                 onClick={deleteFirm}
               >
                 Eliminar Estudio
@@ -245,7 +252,7 @@ export default function MyLawFirm() {
         )}
 
         <button
-          className="text-link mt-4"
+          className="btn btn-link mt-4"
           onClick={() => router.push("/menu")}
         >
           Volver al menú

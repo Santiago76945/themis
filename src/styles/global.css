@@ -183,3 +183,75 @@ button, input, select, textarea {
     padding: var(--space-3) var(--space-2);
   }
 }
+
+/* Tarjetas generales (primarias) */
+.card {
+  background-color: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  width: 100%;
+  margin: var(--space-4) auto;
+  padding: var(--space-4);
+  text-align: left;
+}
+
+/* Tarjetas secundarias (sub‐cards) */
+.card-secondary {
+  background-color: var(--color-surface);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  padding: var(--space-3);
+  margin: var(--space-3) 0;
+  text-align: left;
+}
+
+/* Espacio automático entre botones adyacentes */
+.btn + .btn {
+  margin-left: var(--space-2);
+}
+
+/* Botón ligero para enlaces de acción */
+.btn-link {
+  display: inline-block;
+  background: none;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  padding: var(--space-2) var(--space-3);
+  border-radius: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.btn-link:hover {
+  background: var(--gradient-end);
+  transform: translateY(-2px);
+}
+
+/* Sub‑cards reutilizables en toda la app */
+.card-secondary {
+  background-color: var(--color-surface);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  padding: var(--space-3);
+  margin: var(--space-3) 0;
+  text-align: left;
+}
+
+/* Separación automática entre botones adyacentes */
+.btn + .btn {
+  margin-left: var(--space-2);
+}
+
+/* Estilo de botón‑enlace ligero, para “Volver al menú” u otras acciones */
+.btn-link {
+  display: inline-block;
+  background: none;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  padding: var(--space-2) var(--space-3);
+  border-radius: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.btn-link:hover {
+  background: var(--gradient-end);
+  transform: translateY(-2px);
+}
+

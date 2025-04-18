@@ -1,26 +1,24 @@
 themis-legal-assistant/
-├── .netlify/                      # Configuración y funciones Netlify
+├── .netlify/
 │   └── functions/
 │       ├── auth.ts
-│       ├── createLawFirm.ts          # Nuevo: crea estudios jurídicos
+│       ├── createLawFirm.ts
 │       ├── createUserProfile.ts
-│       ├── getInvitations.ts         # Nuevo: obtiene invitaciones pendientes
-│       ├── getMyLawFirm.ts           # Nuevo: obtiene datos del estudio del usuario
+│       ├── getInvitations.ts
+│       ├── getMyLawFirm.ts
 │       ├── getUserEmailByUniqueCode.ts
 │       ├── getUserProfile.ts
-│       ├── inviteToLawFirm.ts        # Nuevo: envía invitaciones a usuarios
-│       ├── respondInvitation.ts      # Nuevo: responde invitaciones (aceptar/rechazar)
+│       ├── inviteToLawFirm.ts
+│       ├── respondInvitation.ts
 │       └── db.ts
-├── .next/                         # Archivos generados por Next.js (ignorar/oculto)
+├── .next/                         # (generado por Next.js)
 ├── docs/
 │   ├── etapas-de-desarrollo.md
 │   ├── funciones.md
 │   ├── main-menu.md
 │   ├── roles.md
-│   └── tree.md                    # Este archivo
-├── netlify/
-│   └── functions/                # (Puede fusionarse con .netlify/functions)
-├── node_modules/                 # Dependencias instaladas (ignorar/oculto)
+│   └── tree.md
+├── node_modules/
 ├── public/
 │   ├── file.svg
 │   ├── globe.svg
@@ -29,17 +27,29 @@ themis-legal-assistant/
 │   ├── logo-white.png
 │   ├── logo.png
 │   ├── next.svg
-│   ├── old-logo.png              # Nuevo recurso
+│   ├── old-logo.png
 │   ├── vercel.svg
-│   └── window.svg
+│   ├── window.svg
+│   └── icons/
+│       ├── calendar-icon.png
+│       ├── clients-icon.png
+│       ├── court-file-icon.png
+│       ├── finances-icon.png
+│       ├── folder-icon.png
+│       ├── notifications-icon.png
+│       ├── office-icon.png
+│       ├── report-icon.png
+│       ├── task-icons.png
+│       ├── users-icon.png
+│       └── writing-icon.png
 ├── src/
 │   ├── app/
 │   │   ├── login/
 │   │   │   └── page.tsx
 │   │   ├── menu/
 │   │   │   ├── mi-estudio/
-│   │   │   │   └── page.tsx      # MyLawFirm en App Router
-│   │   │   └── page.tsx          # Menu principal
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
 │   │   ├── register/
 │   │   │   └── page.tsx
 │   │   ├── favicon.ico
@@ -51,7 +61,7 @@ themis-legal-assistant/
 │   │   ├── ConsoleEffectWrapper.tsx
 │   │   ├── LoginForm.tsx
 │   │   ├── Menu.tsx
-│   │   └── MyLawFirm.tsx         # Componente de gestión de estudio
+│   │   └── MyLawFirm.tsx
 │   ├── context/
 │   │   └── AuthContext.tsx
 │   ├── lib/
@@ -59,13 +69,14 @@ themis-legal-assistant/
 │   │   ├── firebaseAuth.ts
 │   │   ├── firebaseUser.ts
 │   │   ├── mongoose.ts
-│   │   └── models/                # Nuevos modelos Mongoose
-│   │       ├── LawFirm.ts
-│   │       └── Invitation.ts
+│   │   └── models/
+│   │       ├── Invitation.ts
+│   │       └── LawFirm.ts
 │   ├── styles/
-│   │   ├── global.css            # Estilos globales (Tailwind o similares)
-│   │   ├── LoginForm.css         # Estilos para LoginForm
-│   │   └── Menu.css              # Estilos para Menu
+│   │   ├── global.css
+│   │   ├── LoginForm.module.css
+│   │   ├── Menu.module.css
+│   │   └── MyLawFirm.module.css
 │   └── utils/
 │       └── generateCode.ts
 ├── .env.local

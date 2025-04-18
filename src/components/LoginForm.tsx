@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import "@/styles/LoginForm.css";
+import styles from "@/styles/LoginForm.module.css";
 
 interface LoginFormProps {
   onLogin: (identifier: string, password: string) => Promise<void>;
@@ -44,22 +44,18 @@ export default function LoginForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Enviado formulario de login/registro, isRegister:", isRegister);
     if (isRegister) {
       if (!firstName || !lastName) {
         alert("Por favor ingresa tu nombre y apellido");
         return;
       }
-      console.log("Llamando onRegister con datos:", { identifier, password, firstName, lastName });
       await onRegister(identifier, password, firstName, lastName);
     } else {
-      console.log("Llamando onLogin con identifier:", identifier);
       await onLogin(identifier, password);
     }
   };
 
   const handleInternalKey = async () => {
-    console.log("Botón de creación de usuario interno presionado.");
     if (!internalFirstName || !internalLastName) {
       alert("Por favor ingresa tu nombre y apellido");
       return;
@@ -68,23 +64,29 @@ export default function LoginForm({
       alert("Por favor ingresa una contraseña para tu cuenta interna");
       return;
     }
-    console.log("Llamando onInternalKeyCreate con los datos internos:", {
+    await onInternalKeyCreate(
       internalKey,
       internalPassword,
       internalFirstName,
-      internalLastName,
-    });
-    await onInternalKeyCreate(internalKey, internalPassword, internalFirstName, internalLastName);
+      internalLastName
+    );
   };
 
   return (
-    <div className="card">
-      <div className="logo-container">
-        <Image src="/logo-gold.png" alt="Logo" width={200} height={200} className="logo" />
-        <h1 className="logo-title">Themis</h1>
-        <h2 className="logo-subtitle">Asistente Legal</h2>
+    <div className={styles.card}>
+      <div className={styles.logoContainer}>
+        <Image
+          src="/logo-gold.png"
+          alt="Logo"
+          width={200}
+          height={200}
+          className={styles.logo}
+        />
+        <h1 className={styles.logoTitle}>Themis</h1>
+        <h2 className={styles.logoSubtitle}>Asistente Legal</h2>
       </div>
-      <form onSubmit={handleSubmit} className="form">
+
+      <form onSubmit={handleSubmit} className={styles.form}>
         {isRegister && (
           <>
             <input
@@ -92,7 +94,7 @@ export default function LoginForm({
               placeholder="Nombre"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="input"
+              className={styles.input}
               required
             />
             <input
@@ -100,17 +102,18 @@ export default function LoginForm({
               placeholder="Apellido"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="input"
+              className={styles.input}
               required
             />
           </>
         )}
+
         <input
           type="text"
           placeholder="Correo electrónico o ID de usuario"
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
-          className="input"
+          className={styles.input}
           required
         />
         <input
@@ -118,39 +121,59 @@ export default function LoginForm({
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="input"
+          className={styles.input}
           required
         />
-        <button type="submit" className="btn btn-primary">
+
+        <button
+          type="submit"
+          className={`${styles.btn} ${styles.btnPrimary}`}
+        >
           {isRegister ? "Registrarse" : "Iniciar Sesión"}
         </button>
       </form>
-      <div className="social-buttons">
-        <button onClick={onGoogleLogin} className="btn btn-google">
+
+      <div className={styles.socialButtons}>
+        <button
+          onClick={onGoogleLogin}
+          className={`${styles.btn} ${styles.btnGoogle}`}
+        >
           Iniciar sesión con Google
         </button>
-        <button onClick={onAppleLogin} className="btn btn-apple">
+        <button
+          onClick={onAppleLogin}
+          className={`${styles.btn} ${styles.btnApple}`}
+        >
           Iniciar sesión con Apple
         </button>
       </div>
+
       <div style={{ marginTop: "1rem", textAlign: "center" }}>
         {isRegister ? (
           <p>
             ¿Ya tienes una cuenta?{" "}
-            <button onClick={() => setIsRegister(false)} className="text-link">
+            <button
+              onClick={() => setIsRegister(false)}
+              className={styles.textLink}
+            >
               Inicia sesión
             </button>
           </p>
         ) : (
           <p>
             ¿No tienes cuenta?{" "}
-            <button onClick={() => setIsRegister(true)} className="text-link">
+            <button
+              onClick={() => setIsRegister(true)}
+              className={styles.textLink}
+            >
               Regístrate
             </button>
           </p>
         )}
       </div>
-      <hr className="divider" />
+
+      <hr className={styles.divider} />
+
       <div>
         {showInternalKeyForm ? (
           <>
@@ -159,7 +182,7 @@ export default function LoginForm({
               placeholder="Nombre"
               value={internalFirstName}
               onChange={(e) => setInternalFirstName(e.target.value)}
-              className="input"
+              className={styles.input}
               required
             />
             <input
@@ -167,7 +190,7 @@ export default function LoginForm({
               placeholder="Apellido"
               value={internalLastName}
               onChange={(e) => setInternalLastName(e.target.value)}
-              className="input"
+              className={styles.input}
               required
             />
             <input
@@ -175,7 +198,7 @@ export default function LoginForm({
               placeholder="Contraseña para cuenta interna"
               value={internalPassword}
               onChange={(e) => setInternalPassword(e.target.value)}
-              className="input"
+              className={styles.input}
               required
             />
             <input
@@ -183,20 +206,27 @@ export default function LoginForm({
               placeholder="Clave interna"
               value={internalKey}
               onChange={(e) => setInternalKey(e.target.value)}
-              className="input"
+              className={styles.input}
               required
             />
-            <button onClick={handleInternalKey} className="btn btn-secondary">
+            <button
+              onClick={handleInternalKey}
+              className={`${styles.btn} ${styles.btnSecondary}`}
+            >
               Crear usuario con clave interna
             </button>
           </>
         ) : (
-          <button onClick={() => setShowInternalKeyForm(true)} className="btn btn-secondary">
+          <button
+            onClick={() => setShowInternalKeyForm(true)}
+            className={`${styles.btn} ${styles.btnSecondary}`}
+          >
             Crear usuario con clave interna
           </button>
         )}
       </div>
-      <footer className="copyright">
+
+      <footer className={styles.copyright}>
         Software propiedad de Santiago Haspert Piaggio. Todos los derechos reservados.
       </footer>
     </div>
