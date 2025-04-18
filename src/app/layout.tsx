@@ -2,6 +2,7 @@
 
 import { AuthProvider } from "@/context/AuthContext";
 import Script from "next/script";
+import "@/styles/global.css";
 import ConsoleEffectWrapper from "../components/ConsoleEffectWrapper";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { generateUniqueCode } from "@/utils/generateCode";
+import "@/styles/MyLawFirm.css";
 
 interface LawFirm {
   name: string;
@@ -38,10 +38,8 @@ export default function MyLawFirm() {
 
   const isManager = firm?.managerCode === userCode;
 
-  // Cargo estudio e invitaciones
   useEffect(() => {
     if (!userCode) return;
-
     fetch(`/.netlify/functions/getMyLawFirm?userCode=${userCode}`)
       .then((res) => res.json())
       .then((data) => setFirm(data.firm || null));
@@ -51,7 +49,6 @@ export default function MyLawFirm() {
       .then((data) => setPendingInvites(data.invites || []));
   }, [userCode]);
 
-  // Cargo perfiles de cada miembro
   useEffect(() => {
     if (!firm) return;
     firm.members.forEach((code) => {
@@ -115,98 +112,145 @@ export default function MyLawFirm() {
   };
 
   return (
-    <div className="p-4">
-      {!firm ? (
-        <>
-          <h2 className="text-xl font-bold mb-2">Crear Estudio Jurídico</h2>
-          <input
-            type="text"
-            value={newFirmName}
-            onChange={(e) => setNewFirmName(e.target.value)}
-            placeholder="Nombre del estudio"
-            className="p-2 border rounded mb-2"
-          />
-          <button
-            onClick={createFirm}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Crear
-          </button>
-
-          {pendingInvites.length > 0 && (
-            <div className="mt-4">
-              <h3 className="font-semibold">Tus invitaciones:</h3>
-              {pendingInvites.map((inv) => (
-                <div key={inv._id} className="flex items-center gap-2">
-                  <span>{inv.lawFirmCode}</span>
-                  <button onClick={() => respondInvite(inv._id, "accepted")}>
-                    Aceptar
-                  </button>
-                  <button onClick={() => respondInvite(inv._id, "rejected")}>
-                    Rechazar
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        <>
-          <h2 className="text-xl font-bold mb-2">Mi Estudio Jurídico</h2>
-          <p>
-            <strong>Nombre:</strong> {firm.name}
-          </p>
-          <p>
-            <strong>Código:</strong> {firm.code}
-          </p>
-
-          {isManager && (
-            <div className="mt-4">
-              <h3 className="font-semibold">Invitar abogado:</h3>
+    <div className="container">
+      <div className="card mylawfirm-card">
+        {!firm ? (
+          <section className="create-firm-section">
+            <h2 className="section-title">Crear Estudio Jurídico</h2>
+            <div className="form-row">
               <input
                 type="text"
-                value={inviteCode}
-                onChange={(e) => setInviteCode(e.target.value)}
-                placeholder="Código de usuario"
-                className="p-1 border rounded mr-2"
+                value={newFirmName}
+                onChange={(e) => setNewFirmName(e.target.value)}
+                placeholder="Nombre del estudio"
+                className="input"
               />
-              <button onClick={sendInvite}>Enviar invitación</button>
+              <button onClick={createFirm} className="btn btn-primary">
+                Crear
+              </button>
             </div>
-          )}
 
-          <div className="mt-4">
-            <h3 className="font-semibold">Miembros:</h3>
-            <ul>
-              {firm.members.map((m) => (
-                <li key={m} className="flex justify-between">
-                  <span>
-                    {memberProfiles[m]
-                      ? `${memberProfiles[m].firstName} ${memberProfiles[m].lastName} (ID: ${m})`
-                      : m}
-                  </span>
-                  {isManager && m !== firm.managerCode && (
-                    <button onClick={() => removeMember(m)}>Eliminar</button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
+            {pendingInvites.length > 0 && (
+              <div className="card invites-section">
+                <h3 className="section-subtitle">Tus invitaciones</h3>
+                {pendingInvites.map((inv) => (
+                  <div key={inv._id} className="invitation-item">
+                    <span>{inv.lawFirmCode}</span>
+                    <div className="invitation-actions">
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => respondInvite(inv._id, "accepted")}
+                      >
+                        Aceptar
+                      </button>
+                      <button
+                        className="btn btn-secondary"
+                        onClick={() => respondInvite(inv._id, "rejected")}
+                      >
+                        Rechazar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        ) : (
+          <>
+            <section className="firm-details-section">
+              <h2 className="section-title">Mi Estudio Jurídico</h2>
+              <p>
+                <strong>Nombre:</strong> {firm.name}
+              </p>
+              <p>
+                <strong>Código:</strong> {firm.code}
+              </p>
+            </section>
 
-          {isManager && (
-            <button className="mt-4 text-red-600" onClick={deleteFirm}>
-              Eliminar Estudio
-            </button>
-          )}
-        </>
-      )}
+            {isManager && (
+              <div className="card invite-section">
+                <h3 className="section-subtitle">Invitar abogado</h3>
+                <div className="form-row">
+                  <input
+                    type="text"
+                    value={inviteCode}
+                    onChange={(e) => setInviteCode(e.target.value)}
+                    placeholder="Código de usuario"
+                    className="input"
+                  />
+                  <button onClick={sendInvite} className="btn btn-primary">
+                    Enviar invitación
+                  </button>
+                </div>
+              </div>
+            )}
 
-      {/* Botón para volver al menú */}
-      <button
-        onClick={() => router.push("/menu")}
-        className="mt-6 text-blue-600 underline"
-      >
-        Volver al menú
-      </button>
+            {pendingInvites.length > 0 && (
+              <div className="card invites-section">
+                <h3 className="section-subtitle">Invitaciones pendientes</h3>
+                {pendingInvites.map((inv) => (
+                  <div key={inv._id} className="invitation-item">
+                    <span>{inv.lawFirmCode}</span>
+                    <div className="invitation-actions">
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => respondInvite(inv._id, "accepted")}
+                      >
+                        Aceptar
+                      </button>
+                      <button
+                        className="btn btn-secondary"
+                        onClick={() => respondInvite(inv._id, "rejected")}
+                      >
+                        Rechazar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="card members-section">
+              <h3 className="section-subtitle">Miembros</h3>
+              <ul className="members-list">
+                {firm.members.map((m) => (
+                  <li key={m} className="member-item">
+                    <span>
+                      {memberProfiles[m]
+                        ? `${memberProfiles[m].firstName} ${memberProfiles[m].lastName} (ID: ${m})`
+                        : m}
+                    </span>
+                    {isManager && m !== firm.managerCode && (
+                      <button
+                        className="btn btn-secondary"
+                        onClick={() => removeMember(m)}
+                      >
+                        Eliminar
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {isManager && (
+              <button
+                className="btn btn-secondary delete-btn"
+                onClick={deleteFirm}
+              >
+                Eliminar Estudio
+              </button>
+            )}
+          </>
+        )}
+
+        <button
+          className="text-link mt-4"
+          onClick={() => router.push("/menu")}
+        >
+          Volver al menú
+        </button>
+      </div>
     </div>
   );
 }
