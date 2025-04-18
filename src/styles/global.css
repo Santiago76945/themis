@@ -1,4 +1,4 @@
-/*
+/* src/styles/global.css 
  * Themis App - Global Styles
  *
  * Lineamientos generales:
@@ -6,178 +6,180 @@
  * - Paleta de colores: tonos negros/grises (#121212, #1e1e1e, #2c2c2e, #3c3c3d), acento champagne/beige (#f7e7ce) para elementos interactivos.
  * - Tipografía: familia de sistema; tamaños y pesos definidos con variables CSS.
  * - Espaciado: sistema de espaciados modulables (--space-1, --space-2, ...).
- * - Estructura: cada sección dentro de un .container central con ancho máximo y padding uniforme.
+ * - Estructura: cada sección dentro de un .container con márgenes horizontales y verticales equilibrados.
  * - Componentes: botones, inputs y enlaces reutilizan las variables y transiciones homogéneas.
  */
 
 /* Variables */
 :root {
-    /* Colores */
-    --color-background: #121212;
-    --color-surface:    #1e1e1e;
-    --color-on-surface: #e0e0e0;
-    --color-border:     #3c3c3d;
-    --color-accent:     #f7e7ce;
-    --color-divider:    #3c3c3d;
-    --color-link:       var(--color-accent);
-    --color-link-hover: #d9c9b2;
-  
-    /* Degradados botones */
-    --gradient-start: #1a1a1a;
-    --gradient-end:   #2a2a2a;
-  
-    /* Tipografía */
-    --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-size-base: 1rem;
-    --font-size-lg:   1.125rem;
-    --font-size-xl:   1.5rem;
-    --font-weight-normal: 400;
-    --font-weight-bold:   600;
-  
-    /* Espaciado */
-    --space-1: 0.5rem;
-    --space-2: 1rem;
-    --space-3: 1.5rem;
-    --space-4: 2rem;
-    --space-5: 3rem;
-  
-    /* Breakpoints */
-    --breakpoint-sm:  640px;
-    --breakpoint-md:  768px;
-    --breakpoint-lg: 1024px;
-    --breakpoint-xl: 1280px;
-  }
-  
-  /* Reset básico */
-  *, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  html {
-    font-size: 100%;
-    -webkit-text-size-adjust: 100%;
-  }
-  
-  body {
-    font-family: var(--font-family-base);
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-normal);
-    color: var(--color-on-surface);
-    background-color: var(--color-background);
-    min-height: 100vh;
-    line-height: 1.5;
-  }
-  
-  /* Elementos base */
-  h1, h2, h3, h4, h5, h6 {
-    font-weight: var(--font-weight-bold);
-    color: var(--color-on-surface);
-    margin-bottom: var(--space-2);
-  }
-  
-  p {
-    margin-bottom: var(--space-2);
-  }
-  
-  a {
-    color: var(--color-link);
-    text-decoration: underline;
-    transition: color 0.2s ease;
-  }
-  
-  a:hover {
-    color: var(--color-link-hover);
-  }
-  
-  ul, ol {
-    padding-left: var(--space-3);
-    margin-bottom: var(--space-2);
-  }
-  
-  button, input, select, textarea {
-    font-family: inherit;
-    font-size: inherit;
-    color: inherit;
-    background: none;
-    border: none;
-    outline: none;
-  }
-  
-  /* Container central */
+  /* Colores */
+  --color-background: #121212;
+  --color-surface:    #1e1e1e;
+  --color-on-surface: #e0e0e0;
+  --color-border:     #3c3c3d;
+  --color-accent:     #f7e7ce;
+  --color-divider:    #3c3c3d;
+  --color-link:       var(--color-accent);
+  --color-link-hover: #d9c9b2;
+
+  /* Degradados botones */
+  --gradient-start: #1a1a1a;
+  --gradient-end:   #2a2a2a;
+
+  /* Tipografía */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-size-base: 1rem;
+  --font-size-lg:   1.125rem;
+  --font-size-xl:   1.5rem;
+  --font-weight-normal: 400;
+  --font-weight-bold:   600;
+
+  /* Espaciado */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 3rem;
+
+  /* Breakpoints */
+  --breakpoint-sm:  640px;
+  --breakpoint-md:  768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+}
+
+/* Reset básico */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-on-surface);
+  background-color: var(--color-background);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* Elementos base */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-2);
+}
+
+p {
+  margin-bottom: var(--space-2);
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-link-hover);
+}
+
+ul, ol {
+  padding-left: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+/* Container principal con márgenes equilibrados */
+.container {
+  margin: var(--space-4) var(--space-2);
+  padding: var(--space-4) var(--space-2);
+  text-align: center;
+}
+
+/* Tarjetas generales */
+.card {
+  background-color: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  width: 100%;          /* lleno todo el ancho disponible */
+  max-width: none;      /* quitamos límite de ancho */
+  margin: var(--space-4) auto;
+  position: relative;
+  z-index: 10;
+  text-align: left;
+}
+
+/* Divisor */
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-divider);
+  margin: var(--space-4) 0;
+}
+
+/* Botones */
+.btn {
+  display: inline-block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 8px;
+  cursor: pointer;
+  background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+  color: var(--color-accent);
+  text-align: center;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+}
+
+.btn-secondary {
+  background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+}
+
+/* Formularios */
+.input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: #2c2c2e;
+  color: var(--color-on-surface);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 5px var(--color-accent);
+}
+
+/* Utilidades de espaciado */
+.mt-1 { margin-top: var(--space-1) !important; }
+.mt-2 { margin-top: var(--space-2) !important; }
+.mt-3 { margin-top: var(--space-3) !important; }
+.mb-1 { margin-bottom: var(--space-1) !important; }
+.mb-2 { margin-bottom: var(--space-2) !important; }
+.mb-3 { margin-bottom: var(--space-3) !important; }
+
+/* Responsividad */
+@media (max-width: var(--breakpoint-md)) {
   .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--space-4) var(--space-2);
-    text-align: center; /* ← aquí */
+    padding: var(--space-3) var(--space-2);
   }
-  
-  /* Tarjetas generales */
-  .card {
-    max-width: 400px;
-    width: 90%;
-    margin: var(--space-4) auto;     /* Centrado horizontal y espacio vertical */
-    position: relative;
-    z-index: 10;
-  }
-  
-  /* Divisor */
-  .divider {
-    border: none;
-    border-top: 1px solid var(--color-divider);
-    margin: var(--space-4) 0;
-  }
-  
-  /* Botones */
-  .btn {
-    display: inline-block;
-    padding: var(--space-2) var(--space-3);
-    border-radius: 8px;
-    cursor: pointer;
-    background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
-    color: var(--color-accent);
-    text-align: center;
-    transition: background 0.3s ease, transform 0.2s ease;
-  }
-  
-  .btn:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
-  }
-  
-  .btn-secondary {
-    background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
-  }
-  
-  /* Form controls */
-  .input {
-    width: 100%;
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    background-color: #2c2c2e;
-    color: var(--color-on-surface);
-    transition: border 0.2s ease, box-shadow 0.2s ease;
-  }
-  
-  .input:focus {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 5px var(--color-accent);
-  }
-  
-  /* Utilidades de espaciado */
-  .mt-1 { margin-top: var(--space-1) !important; }
-  .mt-2 { margin-top: var(--space-2) !important; }
-  .mt-3 { margin-top: var(--space-3) !important; }
-  .mb-1 { margin-bottom: var(--space-1) !important; }
-  .mb-2 { margin-bottom: var(--space-2) !important; }
-  .mb-3 { margin-bottom: var(--space-3) !important; }
-  
-  /* Responsividad */
-  @media (max-width: var(--breakpoint-md)) {
-    .container {
-      padding: var(--space-3);
-    }
-  }
-  
+}
