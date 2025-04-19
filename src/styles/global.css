@@ -255,3 +255,13 @@ button, input, select, textarea {
   transform: translateY(-2px);
 }
 
+/* Aplique el mismo “stretch & center” a cualquier grid de cards */
+.grid-stretch {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  align-items: stretch;
+  justify-items: center;
+}
+
+/* Uso: <nav class="grid-stretch">…</nav> */

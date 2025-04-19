@@ -22,26 +22,45 @@
   color: var(--color-on-surface);
 }
 
-/* Sub‑card de invitaciones pendientes */
+/* Sección de invitaciones pendientes */
 .invitationsCard {
   margin-bottom: var(--space-4);
 }
+.invitationHeader {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-3);
+  color: var(--color-on-surface);
+}
+.invitationItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+.invitationActions .btn {
+  margin-left: var(--space-2);
+}
 
-/* Grid responsivo de ítems */
+/* Grid responsivo de ítems: 2 columnas mínimo en móviles */
 .menuNav {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--space-4);
+  align-items: stretch;      /* Fuerza altura uniforme */
+  justify-items: center;     /* Centra cada celda */
 }
 
-/* Contenedor de cada ítem */
+/* Cada contenedor de ítem */
 .menuItem {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-/* Botón de cada ítem: vertical, centrado */
+/* Botón: ocupa todo el alto de la celda */
 .menuButton {
-  position: relative;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -52,6 +71,8 @@
   color: var(--color-on-surface);
   font-size: var(--font-size-base);
   transition: background 0.3s ease, transform 0.2s ease;
+  position: relative;
+  text-align: center;
 }
 
 /* Icono dentro del botón */
@@ -80,7 +101,7 @@
   font-weight: var(--font-weight-bold);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 /* Estados del botón */
@@ -93,11 +114,10 @@
   transform: translateY(-2px);
 }
 
-/* Ajustes móviles */
-@media (max-width: var(--breakpoint-md)) {
+/* Ajustes para pantallas muy angostas */
+@media (max-width: var(--breakpoint-sm)) {
   .menuNav {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: var(--space-3);
   }
 }
-
-
