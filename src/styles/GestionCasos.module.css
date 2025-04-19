@@ -1,0 +1,80 @@
+/* src/styles/GestionCasos.module.css */
+
+/* Header principal */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-size: var(--font-size-xl);
+}
+
+.actionsHeader > .btn + .btn {
+  margin-left: var(--space-2);
+}
+
+/* Formulario */
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  margin-bottom: var(--space-1);
+  font-weight: var(--font-weight-bold);
+}
+
+.actionsForm {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-2);
+}
+
+/* Buscador */
+.search {
+  margin: var(--space-4) 0 var(--space-2);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Lista de casos */
+.caseList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--space-4);
+}
+
+.caseActions {
+  margin-top: var(--space-2);
+}
+
+.caseActions .btn + .btn {
+  margin-left: var(--space-2);
+}
+
+/* Ajustes móviles */
+@media (max-width: var(--breakpoint-sm)) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+  .actionsHeader,
+  .actionsForm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actionsHeader > .btn + .btn,
+  .caseActions .btn + .btn {
+    margin-left: 0;
+    margin-top: var(--space-2);
+  }
+}

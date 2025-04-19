@@ -2,15 +2,15 @@
 
 import type { Handler } from '@netlify/functions';
 import { connectDB } from '../../src/lib/mongoose';
-import { Client } from '../../src/lib/models/Client';
+import { Client }    from '../../src/lib/models/Client';
 import { ClientLog } from '../../src/lib/models/ClientLog';
 
 export const handler: Handler = async (event) => {
   try {
     const body = JSON.parse(event.body || '{}');
-    const { lawFirmCode, userCode, id, updates } = body;
+    const { lawFirmCode, userCode, userName, id, updates } = body;
 
-    if (!lawFirmCode || !userCode || !id || !updates) {
+    if (!lawFirmCode || !userCode || !userName || !id || !updates) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Faltan datos requeridos' }) };
     }
 
@@ -20,19 +20,18 @@ export const handler: Handler = async (event) => {
       { $set: updates },
       { new: true }
     );
-
     if (!client) {
       return { statusCode: 404, body: JSON.stringify({ error: 'Cliente no encontrado' }) };
     }
 
-    // Log de la modificación
+    // Registrar modificación en el log
     const name = `${client.firstName} ${client.lastName}`;
     await ClientLog.create({
       lawFirmCode,
-      clientId: id,
-      userCode,
-      action: `modificó a ${name}`,
-      timestamp: new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Cordoba' })
+      clientId:  id,
+      userName,
+      action:    `modificó al cliente ${name}`,
+      timestamp: new Date()
     });
 
     return { statusCode: 200, body: JSON.stringify({ client }) };

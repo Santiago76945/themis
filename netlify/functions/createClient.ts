@@ -11,48 +11,70 @@ function padId(num: number): string {
 
 export const handler: Handler = async (event) => {
   try {
-    const body = JSON.parse(event.body || '{}');
-    const { lawFirmCode, userCode, firstName, lastName, dni, phone, email, address, additionalInfo } = body;
-
-    if (!lawFirmCode || !userCode || !firstName || !lastName) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'Faltan datos requeridos' }) };
-    }
-
-    await connectDB();
-
-    // Calcular próximo ID
-    const last = await Client.find({ lawFirmCode })
-      .sort({ createdAt: -1 })
-      .limit(1);
-    const nextId = last.length
-      ? padId(Number(last[0].id) + 1)
-      : padId(1);
-
-    const client = new Client({
+    const {
       lawFirmCode,
-      id: nextId,
+      userCode,
+      userName,
       firstName,
       lastName,
       dni,
       phone,
       email,
       address,
-      additionalInfo
+      additionalInfo,
+    } = JSON.parse(event.body || '{}');
+
+    if (!lawFirmCode || !userCode || !userName || !firstName || !lastName) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: 'Faltan datos requeridos: lawFirmCode, userCode, userName, firstName, lastName',
+        }),
+      };
+    }
+
+    await connectDB();
+
+    // Calcular próximo ID secuencial dentro del estudio
+    const last = await Client.find({ lawFirmCode })
+      .sort({ createdAt: -1 })
+      .limit(1)
+      .lean();
+    const nextNum = last.length ? Number(last[0].id) + 1 : 1;
+    const nextId = padId(nextNum);
+
+    const client = new Client({
+      lawFirmCode,
+      id: nextId,
+      userCode,
+      firstName,
+      lastName,
+      dni,
+      phone,
+      email,
+      address,
+      additionalInfo,
     });
     await client.save();
 
-    // Log de la creación
+    // Registrar acción en el log
     await ClientLog.create({
       lawFirmCode,
       clientId: nextId,
-      userCode,
-      action: `añadió a ${firstName} ${lastName}`,
-      timestamp: new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Cordoba' })
+      userName,
+      action: `añadió al cliente ${firstName} ${lastName}`,
+      timestamp: new Date(),
     });
 
-    return { statusCode: 200, body: JSON.stringify({ client }) };
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ client }),
+    };
   } catch (err: any) {
     console.error('createClient error', err);
-    return { statusCode: 500, body: JSON.stringify({ error: 'Error interno' }) };
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Error interno' }),
+    };
   }
 };

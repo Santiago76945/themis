@@ -2,7 +2,14 @@
 
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  ReactNode,
+} from "react";
 import { getAuth, onAuthStateChanged, signOut, User } from "firebase/auth";
 import { app } from "@/lib/firebase";
 import { fetchUserProfileFromMongo } from "@/lib/firebaseUser";
@@ -16,15 +23,17 @@ export interface UserData {
   lastName?: string;
 }
 
-interface AuthContextProps {
+export interface AuthContextProps {
   user: User | null;
   userData: UserData | null;
+  uniqueCode?: string;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
   user: null,
   userData: null,
+  uniqueCode: undefined,
   logout: async () => {},
 });
 
@@ -42,9 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await currentUser.reload();
         if (!extendedProfileRef.current) {
           const mongoProfile = await fetchUserProfileFromMongo(currentUser.uid);
+          let newData: UserData;
+
           if (mongoProfile?.firstName && mongoProfile?.lastName) {
             const fullName = `${mongoProfile.firstName} ${mongoProfile.lastName}`;
-            const newData: UserData = {
+            newData = {
               uid: mongoProfile.uid,
               email: mongoProfile.email,
               displayName: fullName,
@@ -52,24 +63,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               firstName: mongoProfile.firstName,
               lastName: mongoProfile.lastName,
             };
-            setUserData(newData);
-            extendedProfileRef.current = newData;
           } else {
-            const newData: UserData = {
+            newData = {
               uid: currentUser.uid,
               email: currentUser.email || "",
               displayName: currentUser.displayName || "",
               uniqueCode: currentUser.uid.slice(-6).toUpperCase(),
             };
-            setUserData(newData);
-            extendedProfileRef.current = newData;
           }
+
+          setUserData(newData);
+          extendedProfileRef.current = newData;
         }
       } else {
         setUserData(null);
         extendedProfileRef.current = null;
       }
     });
+
     return () => unsubscribe();
   }, [auth]);
 
@@ -78,7 +89,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userData, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        userData,
+        uniqueCode: userData?.uniqueCode,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -20,7 +20,7 @@ interface Client {
 }
 
 interface ClientLogEntry {
-  userCode: string;
+  userName: string;
   action: string;
   timestamp: string;
   clientId: string;
@@ -30,7 +30,8 @@ export default function ClientManager() {
   const router = useRouter();
   const { userData } = useAuth();
   const lawFirmCode = userData?.uniqueCode || "";
-  const userCode = userData?.uniqueCode || "";
+  const userCode     = userData?.uniqueCode || "";
+  const userName     = `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim();
 
   const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,49 +41,44 @@ export default function ClientManager() {
   const [logs, setLogs] = useState<ClientLogEntry[]>([]);
   const [showLogs, setShowLogs] = useState(false);
 
-  // Cargar clientes
+  // Carga inicial de clientes
   const fetchClients = async () => {
     if (!lawFirmCode) return;
-    const res = await fetch(
-      `/.netlify/functions/getClients?lawFirmCode=${lawFirmCode}`
-    );
+    const res = await fetch(`/.netlify/functions/getClients?lawFirmCode=${lawFirmCode}`);
     const data = await res.json();
     setClients(data.clients || []);
   };
 
-  // Cargar logs
+  // Carga global de logs para toda la función Clientes
   const fetchLogs = async () => {
     if (!lawFirmCode) return;
-    const res = await fetch(
-      `/.netlify/functions/getClientLog?lawFirmCode=${lawFirmCode}`
-    );
+    const res = await fetch(`/.netlify/functions/getClientLog?lawFirmCode=${lawFirmCode}`);
     const data = await res.json();
     setLogs(data.logs || []);
+    setShowLogs(true);
   };
 
   useEffect(() => {
     fetchClients();
   }, [lawFirmCode]);
 
-  // Filtrar clientes por término de búsqueda (nombre o apellido)
-  const displayedClients = clients.filter(
+  // Filtrar lista por nombre o apellido
+  const filtered = clients.filter(
     (c) =>
       c.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.firstName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Seleccionar cliente para editar
-  const handleSelect = (client: Client) => {
-    setSelected(client);
-    setForm(client);
+  // Seleccionar un cliente para edición
+  const handleSelect = (c: Client) => {
+    setSelected(c);
+    setForm(c);
     setIsEditing(true);
     setShowLogs(false);
   };
 
-  // Manejar cambios en el formulario
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  // Cambios en formulario
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -90,7 +86,7 @@ export default function ClientManager() {
   // Crear cliente
   const handleAdd = async () => {
     if (!form.firstName || !form.lastName) {
-      alert("Los campos 'Nombre' y 'Apellido' son obligatorios");
+      alert("Nombre y Apellido son obligatorios");
       return;
     }
     await fetch("/.netlify/functions/createClient", {
@@ -99,13 +95,8 @@ export default function ClientManager() {
       body: JSON.stringify({
         lawFirmCode,
         userCode,
-        firstName: form.firstName,
-        lastName: form.lastName,
-        dni: form.dni,
-        phone: form.phone,
-        email: form.email,
-        address: form.address,
-        additionalInfo: form.additionalInfo,
+        userName,
+        ...form,
       }),
     });
     setForm({});
@@ -122,6 +113,7 @@ export default function ClientManager() {
       body: JSON.stringify({
         lawFirmCode,
         userCode,
+        userName,
         id: selected.id,
         updates: form,
       }),
@@ -134,18 +126,14 @@ export default function ClientManager() {
   // Eliminar cliente
   const handleDelete = async () => {
     if (!selected) return;
-    if (
-      !confirm(
-        `¿Eliminar al cliente ${selected.firstName} ${selected.lastName}?`
-      )
-    )
-      return;
+    if (!confirm(`¿Eliminar a ${selected.firstName} ${selected.lastName}?`)) return;
     await fetch("/.netlify/functions/deleteClient", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         lawFirmCode,
         userCode,
+        userName,
         id: selected.id,
       }),
     });
@@ -156,10 +144,11 @@ export default function ClientManager() {
 
   return (
     <div className="container grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* Sidebar: búsqueda, lista y acciones */}
+      {/* Sidebar: búsqueda, lista y log */}
       <aside className="card">
         <h2>Clientes</h2>
 
+        {/* Buscador */}
         <input
           type="text"
           placeholder="Buscar por nombre o apellido"
@@ -168,6 +157,12 @@ export default function ClientManager() {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
+        {/* Botón global de Log */}
+        <button className="btn btn-link mb-2" onClick={fetchLogs}>
+          Ver registro de actividad
+        </button>
+
+        {/* Añadir cliente */}
         <button
           className="btn btn-link mb-2"
           onClick={() => {
@@ -180,8 +175,9 @@ export default function ClientManager() {
           + Agregar cliente
         </button>
 
+        {/* Lista de clientes filtrados */}
         <ul className={styles.clientList}>
-          {displayedClients.map((c) => (
+          {filtered.map((c) => (
             <li
               key={c._id}
               className={`${styles.clientListItem} ${
@@ -194,29 +190,20 @@ export default function ClientManager() {
           ))}
         </ul>
 
-        <button
-          className="btn btn-link mt-2"
-          onClick={() => router.push("/menu")}
-        >
+        <button className="btn btn-link mt-2" onClick={() => router.push("/menu")}>
           ← Volver al menú
         </button>
       </aside>
 
-      {/* Formulario de creación/edición y sección de logs */}
+      {/* Formulario de creación/edición */}
       <section className="card md:col-span-2">
         {isEditing ? (
           <>
             <h3>{selected ? "Editar Cliente" : "Crear Cliente"}</h3>
-
             {selected && (
               <div className="mb-2">
                 <label>ID:</label>
-                <input
-                  className="input"
-                  type="text"
-                  value={selected.id}
-                  disabled
-                />
+                <input className="input" type="text" value={selected.id} disabled />
               </div>
             )}
 
@@ -231,7 +218,6 @@ export default function ClientManager() {
                 required
               />
             </div>
-
             <div className="mb-2">
               <label>Apellido*:</label>
               <input
@@ -243,7 +229,6 @@ export default function ClientManager() {
                 required
               />
             </div>
-
             <div className="mb-2">
               <label>DNI/CUIT:</label>
               <input
@@ -254,7 +239,6 @@ export default function ClientManager() {
                 onChange={handleChange}
               />
             </div>
-
             <div className="mb-2">
               <label>Teléfono:</label>
               <input
@@ -265,7 +249,6 @@ export default function ClientManager() {
                 onChange={handleChange}
               />
             </div>
-
             <div className="mb-2">
               <label>Email:</label>
               <input
@@ -276,7 +259,6 @@ export default function ClientManager() {
                 onChange={handleChange}
               />
             </div>
-
             <div className="mb-2">
               <label>Dirección:</label>
               <input
@@ -287,7 +269,6 @@ export default function ClientManager() {
                 onChange={handleChange}
               />
             </div>
-
             <div className="mb-2">
               <label>Info Adicional:</label>
               <textarea
@@ -306,10 +287,7 @@ export default function ClientManager() {
                   </button>
                   <button
                     className="btn btn-secondary ml-2"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setForm({});
-                    }}
+                    onClick={() => setIsEditing(false)}
                   >
                     Cancelar
                   </button>
@@ -321,50 +299,34 @@ export default function ClientManager() {
                   </button>
                   <button
                     className="btn btn-secondary ml-2"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setSelected(null);
-                    }}
+                    onClick={() => setIsEditing(false)}
                   >
                     Cancelar
                   </button>
-                  <button
-                    className="btn btn-secondary ml-2"
-                    onClick={handleDelete}
-                  >
+                  <button className="btn btn-secondary ml-2" onClick={handleDelete}>
                     Eliminar
-                  </button>
-                  <button
-                    className="btn btn-link ml-2"
-                    onClick={() => {
-                      fetchLogs();
-                      setShowLogs(true);
-                    }}
-                  >
-                    Ver registro
                   </button>
                 </>
               )}
             </div>
           </>
         ) : (
-          <p>Seleccione un cliente o haga clic en "Agregar cliente" para iniciar.</p>
+          <p>Seleccione un cliente o haga clic en “Agregar cliente” para comenzar.</p>
         )}
 
+        {/* Log global */}
         {showLogs && (
-          <div
-            className="card-secondary mt-4"
-            style={{ maxHeight: "300px", overflowY: "auto" }}
-          >
-            <h4>Registro de Clientes</h4>
+          <div className="card-secondary mt-4" style={{ maxHeight: "300px", overflowY: "auto" }}>
+            <h4>Registro de actividad</h4>
             {logs.map((log, i) => (
               <div key={i} className="mb-1">
                 <small>
                   {new Date(log.timestamp).toLocaleString("es-AR", {
                     timeZone: "America/Argentina/Cordoba",
                   })}
-                </small>{" "}
-                – {log.userCode} {log.action}
+                </small>
+                {" – "}
+                {log.userName} {log.action}
               </div>
             ))}
           </div>

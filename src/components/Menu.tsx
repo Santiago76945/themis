@@ -60,7 +60,7 @@ export default function Menu({ userData, onLogout }: MenuProps) {
   const menuItems: MenuItem[] = [
     { label: "Mi estudio jurídico", icon: "/icons/office-icon.png", path: "/menu/mi-estudio", enabled: true },
     { label: "Gestión de clientes", icon: "/icons/clients-icon.png", path: "/menu/clientes", enabled: true },
-    { label: "Gestión de expedientes", icon: "/icons/court-file-icon.png", enabled: false },
+    { label: "Gestión de casos", icon: "/icons/court-file-icon.png", path: "/menu/casos", enabled: true },
     { label: "Gestion de tareas", icon: "/icons/tasks-icon.png", enabled: false },
     { label: "Finanzas del estudio", icon: "/icons/finances-icon.png", enabled: false },
     { label: "Agenda y audiencias", icon: "/icons/calendar-icon.png", enabled: false },
