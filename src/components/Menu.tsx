@@ -19,7 +19,6 @@ interface MenuItem {
   enabled: boolean;
 }
 
-// Defino aquí el shape de UserData que espero recibir
 interface UserData {
   uniqueCode?: string;
   firstName?: string;
@@ -60,7 +59,7 @@ export default function Menu({ userData, onLogout }: MenuProps) {
 
   const menuItems: MenuItem[] = [
     { label: "Mi estudio jurídico", icon: "/icons/office-icon.png", path: "/menu/mi-estudio", enabled: true },
-    { label: "Gestión de clientes", icon: "/icons/clients-icon.png", enabled: false },
+    { label: "Gestión de clientes", icon: "/icons/clients-icon.png", path: "/menu/clientes", enabled: true },
     { label: "Gestión de expedientes", icon: "/icons/court-file-icon.png", enabled: false },
     { label: "Gestion de tareas", icon: "/icons/tasks-icon.png", enabled: false },
     { label: "Finanzas del estudio", icon: "/icons/finances-icon.png", enabled: false },
@@ -87,18 +86,14 @@ export default function Menu({ userData, onLogout }: MenuProps) {
         </header>
 
         {invitations.length > 0 && (
-          <div className={`card-secondary ${styles.invitationsCard}`}>
+          <div className={`card-secondary ${styles.invitationsCard}`}>            
             <h3 className={styles.invitationHeader}>Invitaciones pendientes</h3>
             {invitations.map((inv) => (
               <div key={inv._id} className={styles.invitationItem}>
                 <span>Estudio {inv.lawFirmCode}</span>
                 <div className={styles.invitationActions}>
-                  <button className="btn btn-primary" onClick={() => handleRespond(inv._id, "accepted")}>
-                    Aceptar
-                  </button>
-                  <button className="btn btn-secondary" onClick={() => handleRespond(inv._id, "rejected")}>
-                    Rechazar
-                  </button>
+                  <button className="btn btn-primary" onClick={() => handleRespond(inv._id, "accepted")}>Aceptar</button>
+                  <button className="btn btn-secondary" onClick={() => handleRespond(inv._id, "rejected")}>Rechazar</button>
                 </div>
               </div>
             ))}
