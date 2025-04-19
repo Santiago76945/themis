@@ -7,22 +7,23 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/MyLawFirm.module.css";
 
+interface Profile {
+  firstName: string;
+  lastName: string;
+  uniqueCode: string;
+}
+
 interface LawFirm {
   name: string;
   code: string;
   managerCode: string;
-  members: string[];
+  members: Profile[];
 }
 
 interface Invitation {
   _id: string;
   lawFirmCode: string;
   invitedUserCode: string;
-}
-
-interface Profile {
-  firstName: string;
-  lastName: string;
 }
 
 export default function MyLawFirm() {
@@ -32,42 +33,23 @@ export default function MyLawFirm() {
 
   const [firm, setFirm] = useState<LawFirm | null>(null);
   const [pendingInvites, setPendingInvites] = useState<Invitation[]>([]);
-  const [memberProfiles, setMemberProfiles] = useState<Record<string, Profile>>({});
   const [newFirmName, setNewFirmName] = useState("");
   const [inviteCode, setInviteCode] = useState("");
 
   const isManager = firm?.managerCode === userCode;
 
-  // Carga los datos del estudio y las invitaciones al montar
   useEffect(() => {
     if (!userCode) return;
-    fetch(`/.netlify/functions/getMyLawFirm?userCode=${userCode}`)
+    // Obtener estudio con perfiles de miembros
+    fetch(`/.netlify/functions/getLawFirmWithMembers?userCode=${userCode}`)
       .then((res) => res.json())
       .then((data) => setFirm(data.firm || null));
 
+    // Obtener invitaciones pendientes
     fetch(`/.netlify/functions/getInvitations?userCode=${userCode}`)
       .then((res) => res.json())
       .then((data) => setPendingInvites(data.invites || []));
   }, [userCode]);
-
-  // Carga perfiles de los miembros
-  useEffect(() => {
-    if (!firm) return;
-    firm.members.forEach((code) => {
-      if (!memberProfiles[code]) {
-        fetch(`/.netlify/functions/getUserEmailByUniqueCode?uniqueCode=${code}`)
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.firstName && data.lastName) {
-              setMemberProfiles((prev) => ({
-                ...prev,
-                [code]: { firstName: data.firstName, lastName: data.lastName },
-              }));
-            }
-          });
-      }
-    });
-  }, [firm, memberProfiles]);
 
   const createFirm = () => {
     if (!newFirmName.trim()) {
@@ -108,7 +90,7 @@ export default function MyLawFirm() {
 
   const removeMember = (memberCode: string) => {
     setFirm((f) =>
-      f ? { ...f, members: f.members.filter((m) => m !== memberCode) } : f
+      f ? { ...f, members: f.members.filter((m) => m.uniqueCode !== memberCode) } : f
     );
   };
 
@@ -221,16 +203,14 @@ export default function MyLawFirm() {
               <h3 className={styles.sectionSubtitle}>Miembros</h3>
               <ul className={styles.membersList}>
                 {firm.members.map((m) => (
-                  <li key={m} className={styles.memberItem}>
+                  <li key={m.uniqueCode} className={styles.memberItem}>
                     <span>
-                      {memberProfiles[m]
-                        ? `${memberProfiles[m].firstName} ${memberProfiles[m].lastName} (ID: ${m})`
-                        : m}
+                      {`${m.firstName} ${m.lastName} (ID: ${m.uniqueCode})`}
                     </span>
-                    {isManager && m !== firm.managerCode && (
+                    {isManager && m.uniqueCode !== firm.managerCode && (
                       <button
                         className="btn btn-secondary"
-                        onClick={() => removeMember(m)}
+                        onClick={() => removeMember(m.uniqueCode)}
                       >
                         Eliminar
                       </button>

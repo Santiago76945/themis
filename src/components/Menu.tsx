@@ -77,7 +77,7 @@ export default function Menu({ userData, onLogout }: MenuProps) {
         <header className={styles.menuHeader}>
           <h1 className={styles.menuTitle}>Dashboard</h1>
           <p className={styles.menuSubtitle}>
-            ¡Hola, {fullName}!<br />
+          ¡Hola, Dr. {fullName}! Bienvenido a Themis.<br />
             Tu código de usuario es: <strong>{userCode || "SINCOD"}</strong>
           </p>
           <button className="btn btn-link" onClick={onLogout}>

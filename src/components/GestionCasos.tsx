@@ -5,7 +5,13 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/GestionCasos.module.css";
-import { Cliente, CasoData, LogEntry } from "@/lib/api";
+import {
+  Cliente,
+  CasoData,
+  LogEntry,
+  Abogado,
+  getAbogados,
+} from "@/lib/api";
 
 interface Caso {
   _id: string;
@@ -44,7 +50,17 @@ export default function GestionCasos({
   const [clienteSel, setClienteSel] = useState("");
   const [form, setForm] = useState<CasoData>({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState<"" | "Alta" | "Media" | "Baja">("");
+  const [abogados, setAbogados] = useState<Abogado[]>([]);
 
+  // Carga de abogados para el select de responsables
+  useEffect(() => {
+    const code = clientes[0]?.lawFirmCode;
+    if (!code) return;
+    getAbogados(code).then(setAbogados).catch(console.error);
+  }, [clientes]);
+
+  // Limpia selección cuando no hay clientes
   useEffect(() => {
     if (!clientes.length) {
       setClienteSel("");
@@ -52,9 +68,7 @@ export default function GestionCasos({
   }, [clientes]);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
@@ -67,11 +81,15 @@ export default function GestionCasos({
     setShowForm(false);
   };
 
+  // Filtrado por apellido y prioridad
   const casosFiltrados = casos.filter((c) => {
     const cli = clientes.find((x) => x.id === c.clienteId);
-    return cli
+    const matchName = cli
       ? cli.lastName.toLowerCase().includes(searchTerm.trim().toLowerCase())
       : false;
+    const matchPriority =
+      priorityFilter === "" || c.prioridad === priorityFilter;
+    return matchName && matchPriority;
   });
 
   return (
@@ -103,6 +121,7 @@ export default function GestionCasos({
                 handleSubmit();
               }}
             >
+              {/* Cliente */}
               <div className={styles.field}>
                 <label htmlFor="cliente">Cliente</label>
                 <select
@@ -121,6 +140,7 @@ export default function GestionCasos({
                 </select>
               </div>
 
+              {/* Referencia */}
               <div className={styles.field}>
                 <label htmlFor="referencia">Referencia</label>
                 <input
@@ -132,6 +152,7 @@ export default function GestionCasos({
                 />
               </div>
 
+              {/* Número de Expediente */}
               <div className={styles.field}>
                 <label htmlFor="numeroExpediente">N° Expediente</label>
                 <input
@@ -143,6 +164,7 @@ export default function GestionCasos({
                 />
               </div>
 
+              {/* Prioridad */}
               <div className={styles.field}>
                 <label htmlFor="prioridad">Prioridad</label>
                 <select
@@ -159,6 +181,7 @@ export default function GestionCasos({
                 </select>
               </div>
 
+              {/* Descripción */}
               <div className={styles.fieldFull}>
                 <label htmlFor="descripcion">Descripción</label>
                 <textarea
@@ -171,6 +194,7 @@ export default function GestionCasos({
                 />
               </div>
 
+              {/* Tribunal */}
               <div className={styles.field}>
                 <label htmlFor="tribunal">Tribunal</label>
                 <input
@@ -182,6 +206,7 @@ export default function GestionCasos({
                 />
               </div>
 
+              {/* Etapa Procesal Actual */}
               <div className={styles.field}>
                 <label htmlFor="etapaProcesal">Etapa Procesal Actual</label>
                 <input
@@ -193,6 +218,7 @@ export default function GestionCasos({
                 />
               </div>
 
+              {/* Próxima Acción Esperada */}
               <div className={styles.field}>
                 <label htmlFor="proximaAccion">Próxima Acción Esperada</label>
                 <input
@@ -204,6 +230,7 @@ export default function GestionCasos({
                 />
               </div>
 
+              {/* Fecha de Próxima Acción */}
               <div className={styles.field}>
                 <label htmlFor="fechaProximaAccion">Fecha de Próxima Acción</label>
                 <input
@@ -216,6 +243,7 @@ export default function GestionCasos({
                 />
               </div>
 
+              {/* Fecha de Inicio del Juicio */}
               <div className={styles.field}>
                 <label htmlFor="fechaInicioJuicio">Fecha de Inicio del Juicio</label>
                 <input
@@ -228,17 +256,26 @@ export default function GestionCasos({
                 />
               </div>
 
+              {/* Responsable/s */}
               <div className={styles.field}>
                 <label htmlFor="responsables">Responsable/s</label>
-                <input
+                <select
                   id="responsables"
                   name="responsables"
                   className="input"
                   value={form.responsables || ""}
                   onChange={handleChange}
-                />
+                >
+                  <option value="">-- seleccioná abogado --</option>
+                  {abogados.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.nombre}
+                    </option>
+                  ))}
+                </select>
               </div>
 
+              {/* Botón Crear */}
               <div className={styles.actionsForm}>
                 <button
                   type="submit"
@@ -252,8 +289,8 @@ export default function GestionCasos({
           </div>
         )}
 
-        {/* Buscador */}
-        <div className={styles.search}>
+        {/* Filtros */}
+        <div className={styles.filters}>
           <input
             type="text"
             placeholder="Buscar por apellido"
@@ -261,9 +298,21 @@ export default function GestionCasos({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          <select
+            className="input"
+            value={priorityFilter}
+            onChange={(e) =>
+              setPriorityFilter(e.target.value as "Alta" | "Media" | "Baja" | "")
+            }
+          >
+            <option value="">Todas las prioridades</option>
+            <option value="Alta">Alta</option>
+            <option value="Media">Media</option>
+            <option value="Baja">Baja</option>
+          </select>
         </div>
 
-        {/* Lista de casos */}
+        {/* Lista de Casos */}
         <div className={styles.caseList}>
           {casosFiltrados.map((c) => {
             const cli = clientes.find((x) => x.id === c.clienteId);

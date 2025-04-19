@@ -33,6 +33,11 @@ export interface LogEntry {
   fecha: string;
 }
 
+export interface Abogado {
+  id: string;
+  nombre: string;
+}
+
 const callFn = async (fn: string, opts?: RequestInit) => {
   const res = await fetch(`/.netlify/functions/${fn}`, opts);
   if (!res.ok) {
@@ -43,18 +48,30 @@ const callFn = async (fn: string, opts?: RequestInit) => {
 };
 
 /**
- * Ahora getClientes recibe el código del estudio (lawFirmCode)
+ * Obtiene los clientes para un estudio (lawFirmCode)
  */
 export const getClientes = async (lawFirmCode: string): Promise<Cliente[]> => {
   try {
     const { clients } = await callFn(`getClients?lawFirmCode=${lawFirmCode}`);
     return clients;
   } catch (err: any) {
+    // si no existe la función o retorna 404, devolvemos arreglo vacío
     if (err.message.includes("404")) return [];
     throw err;
   }
 };
 
+/**
+ * Obtiene los abogados para un estudio (lawFirmCode)
+ */
+export const getAbogados = async (lawFirmCode: string): Promise<Abogado[]> => {
+  const { abogados } = await callFn(`getAbogados?lawFirmCode=${lawFirmCode}`);
+  return abogados;
+};
+
+/**
+ * Crea un nuevo caso asociado a un cliente
+ */
 export const crearCaso = (clienteId: string, data: CasoData) =>
   callFn("crearCaso", {
     method: "POST",
@@ -62,6 +79,9 @@ export const crearCaso = (clienteId: string, data: CasoData) =>
     body: JSON.stringify({ clienteId, data }),
   });
 
+/**
+ * Modifica un caso existente
+ */
 export const modificarCaso = (casoId: string, data: CasoData) =>
   callFn("modificarCaso", {
     method: "PUT",
@@ -69,6 +89,9 @@ export const modificarCaso = (casoId: string, data: CasoData) =>
     body: JSON.stringify({ casoId, data }),
   });
 
+/**
+ * Elimina un caso por su ID
+ */
 export const eliminarCaso = (casoId: string) =>
   callFn("eliminarCaso", {
     method: "DELETE",
@@ -76,5 +99,8 @@ export const eliminarCaso = (casoId: string) =>
     body: JSON.stringify({ casoId }),
   });
 
-export const getLogCasos = () =>
-  callFn("getLogCasos").then((json) => json);
+/**
+ * Obtiene el log de acciones de casos
+ */
+export const getLogCasos = (): Promise<LogEntry[]> =>
+  callFn("getLogCasos");
