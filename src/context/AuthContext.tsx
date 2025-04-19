@@ -21,12 +21,14 @@ export interface UserData {
   uniqueCode?: string;
   firstName?: string;
   lastName?: string;
+  lawFirmCode?: string;      // <-- agregado
 }
 
 export interface AuthContextProps {
   user: User | null;
   userData: UserData | null;
   uniqueCode?: string;
+  lawFirmCode?: string;      // <-- agregado
   logout: () => Promise<void>;
 }
 
@@ -34,6 +36,7 @@ const AuthContext = createContext<AuthContextProps>({
   user: null,
   userData: null,
   uniqueCode: undefined,
+  lawFirmCode: undefined,
   logout: async () => {},
 });
 
@@ -62,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               uniqueCode: mongoProfile.uniqueCode,
               firstName: mongoProfile.firstName,
               lastName: mongoProfile.lastName,
+              lawFirmCode: mongoProfile.lawFirmCode,  // <-- agregado
             };
           } else {
             newData = {
@@ -69,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               email: currentUser.email || "",
               displayName: currentUser.displayName || "",
               uniqueCode: currentUser.uid.slice(-6).toUpperCase(),
+              // lawFirmCode queda undefined si no viene de Mongo
             };
           }
 
@@ -94,6 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         userData,
         uniqueCode: userData?.uniqueCode,
+        lawFirmCode: userData?.lawFirmCode,  // <-- expuesto aquí
         logout,
       }}
     >

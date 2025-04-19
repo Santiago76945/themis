@@ -40,13 +40,14 @@ export default function MyLawFirm() {
 
   useEffect(() => {
     if (!userCode) return;
-    // Obtener estudio con perfiles de miembros
-    fetch(`/.netlify/functions/getLawFirmWithMembers?userCode=${userCode}`)
+
+    // Obtener el estudio completo con perfiles de miembros
+    fetch(`/.netlify/functions/getMyLawFirm?userCode=${encodeURIComponent(userCode)}`)
       .then((res) => res.json())
       .then((data) => setFirm(data.firm || null));
 
     // Obtener invitaciones pendientes
-    fetch(`/.netlify/functions/getInvitations?userCode=${userCode}`)
+    fetch(`/.netlify/functions/getInvitations?userCode=${encodeURIComponent(userCode)}`)
       .then((res) => res.json())
       .then((data) => setPendingInvites(data.invites || []));
   }, [userCode]);
@@ -221,10 +222,7 @@ export default function MyLawFirm() {
             </div>
 
             {isManager && (
-              <button
-                className="btn btn-secondary"
-                onClick={deleteFirm}
-              >
+              <button className="btn btn-secondary" onClick={deleteFirm}>
                 Eliminar Estudio
               </button>
             )}

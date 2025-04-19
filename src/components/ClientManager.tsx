@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/Clients.module.css";
 
 interface Client {
-  _id: string;
+  _id?: string;
   id: string;
   firstName: string;
   lastName: string;
@@ -41,7 +41,6 @@ export default function ClientManager() {
   const [logs, setLogs] = useState<ClientLogEntry[]>([]);
   const [showLogs, setShowLogs] = useState(false);
 
-  // Carga inicial de clientes
   const fetchClients = async () => {
     if (!lawFirmCode) return;
     const res = await fetch(`/.netlify/functions/getClients?lawFirmCode=${lawFirmCode}`);
@@ -49,7 +48,6 @@ export default function ClientManager() {
     setClients(data.clients || []);
   };
 
-  // Carga global de logs para toda la función Clientes
   const fetchLogs = async () => {
     if (!lawFirmCode) return;
     const res = await fetch(`/.netlify/functions/getClientLog?lawFirmCode=${lawFirmCode}`);
@@ -62,14 +60,12 @@ export default function ClientManager() {
     fetchClients();
   }, [lawFirmCode]);
 
-  // Filtrar lista por nombre o apellido
   const filtered = clients.filter(
     (c) =>
       c.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.firstName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Seleccionar un cliente para edición
   const handleSelect = (c: Client) => {
     setSelected(c);
     setForm(c);
@@ -77,13 +73,11 @@ export default function ClientManager() {
     setShowLogs(false);
   };
 
-  // Cambios en formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Crear cliente
   const handleAdd = async () => {
     if (!form.firstName || !form.lastName) {
       alert("Nombre y Apellido son obligatorios");
@@ -104,7 +98,6 @@ export default function ClientManager() {
     fetchClients();
   };
 
-  // Actualizar cliente
   const handleUpdate = async () => {
     if (!selected) return;
     await fetch("/.netlify/functions/updateClient", {
@@ -123,7 +116,6 @@ export default function ClientManager() {
     fetchClients();
   };
 
-  // Eliminar cliente
   const handleDelete = async () => {
     if (!selected) return;
     if (!confirm(`¿Eliminar a ${selected.firstName} ${selected.lastName}?`)) return;
@@ -144,11 +136,9 @@ export default function ClientManager() {
 
   return (
     <div className="container grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* Sidebar: búsqueda, lista y log */}
       <aside className="card">
         <h2>Clientes</h2>
 
-        {/* Buscador */}
         <input
           type="text"
           placeholder="Buscar por nombre o apellido"
@@ -157,12 +147,10 @@ export default function ClientManager() {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        {/* Botón global de Log */}
         <button className="btn btn-link mb-2" onClick={fetchLogs}>
           Ver registro de actividad
         </button>
 
-        {/* Añadir cliente */}
         <button
           className="btn btn-link mb-2"
           onClick={() => {
@@ -175,11 +163,10 @@ export default function ClientManager() {
           + Agregar cliente
         </button>
 
-        {/* Lista de clientes filtrados */}
         <ul className={styles.clientList}>
           {filtered.map((c) => (
             <li
-              key={c._id}
+              key={c._id || c.id}
               className={`${styles.clientListItem} ${
                 selected?._id === c._id ? styles.selected : ""
               }`}
@@ -195,7 +182,6 @@ export default function ClientManager() {
         </button>
       </aside>
 
-      {/* Formulario de creación/edición */}
       <section className="card md:col-span-2">
         {isEditing ? (
           <>
@@ -314,7 +300,6 @@ export default function ClientManager() {
           <p>Seleccione un cliente o haga clic en “Agregar cliente” para comenzar.</p>
         )}
 
-        {/* Log global */}
         {showLogs && (
           <div className="card-secondary mt-4" style={{ maxHeight: "300px", overflowY: "auto" }}>
             <h4>Registro de actividad</h4>
