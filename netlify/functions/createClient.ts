@@ -1,6 +1,5 @@
-// ================================
-// .netlify/functions/createClient.ts
-// ================================
+// netlify/functions/createClient.ts
+
 import type { Handler } from '@netlify/functions';
 import { connectDB } from '../../src/lib/mongoose';
 import { Client } from '../../src/lib/models/Client';
@@ -13,11 +12,14 @@ function padId(num: number): string {
 export const handler: Handler = async (event) => {
   try {
     const body = JSON.parse(event.body || '{}');
-    const { lawFirmCode, userCode, name, dni, phone, email, additionalInfo } = body;
-    if (!lawFirmCode || !userCode || !name || !dni || !phone || !email) {
+    const { lawFirmCode, userCode, firstName, lastName, dni, phone, email, address, additionalInfo } = body;
+
+    if (!lawFirmCode || !userCode || !firstName || !lastName) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Faltan datos requeridos' }) };
     }
+
     await connectDB();
+
     // Calcular próximo ID
     const last = await Client.find({ lawFirmCode })
       .sort({ createdAt: -1 })
@@ -29,21 +31,23 @@ export const handler: Handler = async (event) => {
     const client = new Client({
       lawFirmCode,
       id: nextId,
-      name,
+      firstName,
+      lastName,
       dni,
       phone,
       email,
+      address,
       additionalInfo
     });
     await client.save();
 
-    // Log
+    // Log de la creación
     await ClientLog.create({
       lawFirmCode,
       clientId: nextId,
       userCode,
-      action: `añadió a ${name}`,
-      timestamp: new Date().toLocaleString('sv') /* ISO-like string, ajusta si quieres timezone */
+      action: `añadió a ${firstName} ${lastName}`,
+      timestamp: new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Cordoba' })
     });
 
     return { statusCode: 200, body: JSON.stringify({ client }) };

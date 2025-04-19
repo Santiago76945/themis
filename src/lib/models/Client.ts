@@ -1,28 +1,31 @@
-// ================================
 // src/lib/models/Client.ts
-// ================================
+
 import mongoose from 'mongoose';
 
 export interface IClient {
   lawFirmCode: string;
   id: string;              // "01", "02", ...
-  name: string;
-  dni: string;
-  phone: string;
-  email: string;
+  firstName: string;
+  lastName: string;
+  dni?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
   additionalInfo?: string;
   createdAt: Date;
 }
 
 const ClientSchema = new mongoose.Schema<IClient>(
   {
-    lawFirmCode: { type: String, required: true, index: true },
-    id: { type: String, required: true },
-    name: { type: String, required: true },
-    dni: { type: String, required: true },
-    phone: { type: String, required: true },
-    email: { type: String, required: true },
-    additionalInfo: { type: String },
+    lawFirmCode:   { type: String, required: true, index: true },
+    id:            { type: String, required: true },
+    firstName:     { type: String, required: true },
+    lastName:      { type: String, required: true },
+    dni:           { type: String },
+    phone:         { type: String },
+    email:         { type: String },
+    address:       { type: String },
+    additionalInfo:{ type: String },
   },
   {
     collection: 'clients',

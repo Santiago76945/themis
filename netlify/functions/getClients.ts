@@ -1,6 +1,5 @@
-// ================================
-// .netlify/functions/getClients.ts
-// ================================
+// netlify/functions/getClients.ts
+
 import type { Handler } from '@netlify/functions';
 import { connectDB } from '../../src/lib/mongoose';
 import { Client } from '../../src/lib/models/Client';

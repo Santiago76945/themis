@@ -1,6 +1,5 @@
-// ================================
-// .netlify/functions/updateClient.ts
-// ================================
+// netlify/functions/updateClient.ts
+
 import type { Handler } from '@netlify/functions';
 import { connectDB } from '../../src/lib/mongoose';
 import { Client } from '../../src/lib/models/Client';
@@ -10,25 +9,32 @@ export const handler: Handler = async (event) => {
   try {
     const body = JSON.parse(event.body || '{}');
     const { lawFirmCode, userCode, id, updates } = body;
+
     if (!lawFirmCode || !userCode || !id || !updates) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Faltan datos requeridos' }) };
     }
+
     await connectDB();
     const client = await Client.findOneAndUpdate(
       { lawFirmCode, id },
       { $set: updates },
       { new: true }
     );
+
     if (!client) {
       return { statusCode: 404, body: JSON.stringify({ error: 'Cliente no encontrado' }) };
     }
+
+    // Log de la modificación
+    const name = `${client.firstName} ${client.lastName}`;
     await ClientLog.create({
       lawFirmCode,
       clientId: id,
       userCode,
-      action: `modificó a ${client.name}`,
-      timestamp: new Date().toLocaleString('sv')
+      action: `modificó a ${name}`,
+      timestamp: new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Cordoba' })
     });
+
     return { statusCode: 200, body: JSON.stringify({ client }) };
   } catch (err: any) {
     console.error('updateClient error', err);
