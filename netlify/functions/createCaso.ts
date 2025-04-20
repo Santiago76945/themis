@@ -2,7 +2,6 @@
 
 import type { Handler } from "@netlify/functions";
 import { connectDB } from "../../src/lib/mongoose";
-import mongoose from "mongoose";
 import { Caso } from "../../src/lib/models/Caso";
 import { CasoLog } from "../../src/lib/models/CasoLog";
 
@@ -18,6 +17,7 @@ export const handler: Handler = async (event) => {
 
     await connectDB();
 
+    // Creamos y guardamos el caso
     const caso = new Caso({
       clienteId,
       ...data,
@@ -25,12 +25,15 @@ export const handler: Handler = async (event) => {
     });
     await caso.save();
 
-    // Log
+    // Convertimos el _id a string de forma segura
+    const casoIdStr = String(caso._id);
+
+    // Registramos en el log
     await CasoLog.create({
-      casoId: caso._id.toString(),
+      casoId:   casoIdStr,
       userCode,
       userName,
-      action: `creó caso (${caso._id.toString()}) para cliente ${clienteId}`,
+      action:   `creó caso (${casoIdStr}) para cliente ${clienteId}`,
       timestamp: new Date(),
     });
 
