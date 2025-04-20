@@ -55,7 +55,6 @@ export const getClientes = async (lawFirmCode: string): Promise<Cliente[]> => {
     const { clients } = await callFn(`getClients?lawFirmCode=${lawFirmCode}`);
     return clients;
   } catch (err: any) {
-    // si no existe la función o retorna 404, devolvemos arreglo vacío
     if (err.message.includes("404")) return [];
     throw err;
   }
@@ -72,35 +71,71 @@ export const getAbogados = async (lawFirmCode: string): Promise<Abogado[]> => {
 /**
  * Crea un nuevo caso asociado a un cliente
  */
-export const crearCaso = (clienteId: string, data: CasoData) =>
+export const crearCaso = (
+  clienteId: string,
+  data: CasoData,
+  usuario: string,
+  nombreUsuario: string
+) =>
   callFn("crearCaso", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ clienteId, data }),
+    body: JSON.stringify({
+      clienteId,
+      data,
+      userCode: usuario,
+      userName: nombreUsuario,
+    }),
   });
 
 /**
  * Modifica un caso existente
  */
-export const modificarCaso = (casoId: string, data: CasoData) =>
+export const modificarCaso = (
+  casoId: string,
+  data: CasoData,
+  usuario: string,
+  nombreUsuario: string
+) =>
   callFn("modificarCaso", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ casoId, data }),
+    body: JSON.stringify({
+      casoId,
+      data,
+      userCode: usuario,
+      userName: nombreUsuario,
+    }),
   });
 
 /**
  * Elimina un caso por su ID
  */
-export const eliminarCaso = (casoId: string) =>
+export const eliminarCaso = (
+  casoId: string,
+  usuario: string,
+  nombreUsuario: string
+) =>
   callFn("eliminarCaso", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ casoId }),
+    body: JSON.stringify({
+      casoId,
+      userCode: usuario,
+      userName: nombreUsuario,
+    }),
   });
 
 /**
- * Obtiene el log de acciones de casos
+ * Obtiene el log de acciones de casos, formatea fecha y hora en 'es-AR'
  */
-export const getLogCasos = (): Promise<LogEntry[]> =>
-  callFn("getLogCasos");
+export const getLogCasos = async (): Promise<LogEntry[]> => {
+  const { logs } = await callFn("getLogCasos");
+  return (logs as any[]).map((l) => ({
+    usuario: l.userName,
+    accion:  l.action,
+    fecha:   new Date(l.timestamp).toLocaleString("es-AR", {
+      timeZone: "America/Argentina/Cordoba",
+    }),
+  }));
+};

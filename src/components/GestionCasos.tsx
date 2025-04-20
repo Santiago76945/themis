@@ -11,6 +11,7 @@ import {
   LogEntry,
   Abogado,
   getAbogados,
+  getLogCasos,
 } from "@/lib/api";
 
 interface Caso {
@@ -34,7 +35,6 @@ interface Props {
   onCrear: (clienteId: string, data: CasoData) => void;
   onModificar: (casoId: string, data: CasoData) => void;
   onEliminar: (casoId: string) => void;
-  log: LogEntry[];
 }
 
 export default function GestionCasos({
@@ -43,7 +43,6 @@ export default function GestionCasos({
   onCrear,
   onModificar,
   onEliminar,
-  log,
 }: Props) {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
@@ -52,28 +51,33 @@ export default function GestionCasos({
   const [searchTerm, setSearchTerm] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<"" | "Alta" | "Media" | "Baja">("");
   const [abogados, setAbogados] = useState<Abogado[]>([]);
+  const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
+  const [showLogs, setShowLogs] = useState(false);
 
-  // Carga de abogados para el select de responsables
+  // Cargar lista de abogados para el select
   useEffect(() => {
     const code = clientes[0]?.lawFirmCode;
-    if (!code) return;
-    getAbogados(code).then(setAbogados).catch(console.error);
+    if (code) {
+      getAbogados(code).then(setAbogados).catch(console.error);
+    }
   }, [clientes]);
 
-  // Limpia selección cuando no hay clientes
+  // Limpiar selección si no hay clientes
   useEffect(() => {
     if (!clientes.length) {
       setClienteSel("");
     }
   }, [clientes]);
 
+  // Manejar cambios de formulario
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Enviar formulario para crear caso
   const handleSubmit = () => {
     if (!clienteSel) return;
     onCrear(clienteSel, form);
@@ -81,37 +85,38 @@ export default function GestionCasos({
     setShowForm(false);
   };
 
-  // Filtrado por apellido y prioridad
+  // Filtrar casos por apellido y por prioridad
   const casosFiltrados = casos.filter((c) => {
     const cli = clientes.find((x) => x.id === c.clienteId);
     const matchName = cli
       ? cli.lastName.toLowerCase().includes(searchTerm.trim().toLowerCase())
       : false;
-    const matchPriority =
-      priorityFilter === "" || c.prioridad === priorityFilter;
+    const matchPriority = !priorityFilter || c.prioridad === priorityFilter;
     return matchName && matchPriority;
   });
+
+  // Cargar log de casos
+  const loadLogs = async () => {
+    const logs = await getLogCasos();
+    setLogEntries(logs);
+    setShowLogs(true);
+  };
 
   return (
     <div className="container">
       <div className="card">
-        {/* Header */}
+        {/* Header: título y botón Añadir Caso */}
         <div className={styles.header}>
           <h2 className={styles.title}>Gestión de Casos</h2>
-          <div className={styles.actionsHeader}>
-            <button className="btn btn-link" onClick={() => router.push("/menu")}>
-              Volver al menú
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setShowForm((v) => !v)}
-            >
-              {showForm ? "Cancelar" : "Añadir caso"}
-            </button>
-          </div>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setShowForm((v) => !v)}
+          >
+            {showForm ? "Cancelar" : "Añadir caso"}
+          </button>
         </div>
 
-        {/* Formulario */}
+        {/* Formulario de nuevo caso */}
         {showForm && (
           <div className="card-secondary">
             <form
@@ -121,7 +126,6 @@ export default function GestionCasos({
                 handleSubmit();
               }}
             >
-              {/* Cliente */}
               <div className={styles.field}>
                 <label htmlFor="cliente">Cliente</label>
                 <select
@@ -140,7 +144,6 @@ export default function GestionCasos({
                 </select>
               </div>
 
-              {/* Referencia */}
               <div className={styles.field}>
                 <label htmlFor="referencia">Referencia</label>
                 <input
@@ -152,7 +155,6 @@ export default function GestionCasos({
                 />
               </div>
 
-              {/* Número de Expediente */}
               <div className={styles.field}>
                 <label htmlFor="numeroExpediente">N° Expediente</label>
                 <input
@@ -164,7 +166,6 @@ export default function GestionCasos({
                 />
               </div>
 
-              {/* Prioridad */}
               <div className={styles.field}>
                 <label htmlFor="prioridad">Prioridad</label>
                 <select
@@ -181,7 +182,6 @@ export default function GestionCasos({
                 </select>
               </div>
 
-              {/* Descripción */}
               <div className={styles.fieldFull}>
                 <label htmlFor="descripcion">Descripción</label>
                 <textarea
@@ -194,7 +194,6 @@ export default function GestionCasos({
                 />
               </div>
 
-              {/* Tribunal */}
               <div className={styles.field}>
                 <label htmlFor="tribunal">Tribunal</label>
                 <input
@@ -206,7 +205,6 @@ export default function GestionCasos({
                 />
               </div>
 
-              {/* Etapa Procesal Actual */}
               <div className={styles.field}>
                 <label htmlFor="etapaProcesal">Etapa Procesal Actual</label>
                 <input
@@ -218,7 +216,6 @@ export default function GestionCasos({
                 />
               </div>
 
-              {/* Próxima Acción Esperada */}
               <div className={styles.field}>
                 <label htmlFor="proximaAccion">Próxima Acción Esperada</label>
                 <input
@@ -230,9 +227,8 @@ export default function GestionCasos({
                 />
               </div>
 
-              {/* Fecha de Próxima Acción */}
               <div className={styles.field}>
-                <label htmlFor="fechaProximaAccion">Fecha de Próxima Acción</label>
+                <label htmlFor="fechaProximaAccion">Fecha Próx. Acción</label>
                 <input
                   id="fechaProximaAccion"
                   name="fechaProximaAccion"
@@ -243,9 +239,8 @@ export default function GestionCasos({
                 />
               </div>
 
-              {/* Fecha de Inicio del Juicio */}
               <div className={styles.field}>
-                <label htmlFor="fechaInicioJuicio">Fecha de Inicio del Juicio</label>
+                <label htmlFor="fechaInicioJuicio">Fecha Inicio Juicio</label>
                 <input
                   id="fechaInicioJuicio"
                   name="fechaInicioJuicio"
@@ -256,7 +251,6 @@ export default function GestionCasos({
                 />
               </div>
 
-              {/* Responsable/s */}
               <div className={styles.field}>
                 <label htmlFor="responsables">Responsable/s</label>
                 <select
@@ -275,7 +269,6 @@ export default function GestionCasos({
                 </select>
               </div>
 
-              {/* Botón Crear */}
               <div className={styles.actionsForm}>
                 <button
                   type="submit"
@@ -347,6 +340,35 @@ export default function GestionCasos({
           })}
           {casosFiltrados.length === 0 && <p>No se encontraron casos.</p>}
         </div>
+
+        {/* Botones al pie */}
+        <div className={styles.bottomActions}>
+          <button className="btn btn-link" onClick={loadLogs}>
+            Ver registro de casos
+          </button>
+          <button className="btn btn-link" onClick={() => router.push("/menu")}>
+            Volver al menú
+          </button>
+        </div>
+
+        {/* Registro de Casos */}
+        {showLogs && (
+          <div className="card-secondary">
+            <h3>Registro de Casos</h3>
+            {logEntries.length > 0 ? (
+              <ul className={styles.logList}>
+                {logEntries.map((entry, i) => (
+                  <li key={i}>
+                    <small>{entry.fecha}</small>{" "}
+                    <strong>{entry.usuario}</strong> {entry.accion}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No hay registros aún.</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,26 +1,45 @@
-// .netlify/functions/modificarCaso.ts
+// netlify/functions/modificarCaso.ts
 
 import type { Handler } from "@netlify/functions";
-import { connectToDatabase } from "./db";
-import mongoose from "mongoose";
-
-const CasoSchema = new mongoose.Schema({}, { collection: "casos" });
-const LogSchema  = new mongoose.Schema({}, { collection: "logs"  });
-
-const Caso = mongoose.models.Caso || mongoose.model("Caso", CasoSchema);
-const Log  = mongoose.models.Log  || mongoose.model("Log",  LogSchema);
+import { connectDB } from "../../src/lib/mongoose";
+import { Caso } from "../../src/lib/models/Caso";
+import { CasoLog } from "../../src/lib/models/CasoLog";
 
 export const handler: Handler = async (event) => {
-  if (event.httpMethod !== "PUT") {
-    return { statusCode: 405, body: "Método no permitido" };
+  try {
+    const { casoId, data, userCode, userName } = JSON.parse(event.body || "{}");
+    if (!casoId || !data || !userCode || !userName) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Faltan datos requeridos" }),
+      };
+    }
+
+    await connectDB();
+
+    const updated = await Caso.findByIdAndUpdate(casoId, data, { new: true });
+    if (!updated) {
+      return { statusCode: 404, body: JSON.stringify({ error: "Caso no encontrado" }) };
+    }
+
+    // Log
+    await CasoLog.create({
+      casoId,
+      userCode,
+      userName,
+      action: `modificó caso (${casoId})`,
+      timestamp: new Date(),
+    });
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ caso: updated }),
+    };
+  } catch (err: any) {
+    console.error("modificarCaso error", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Error interno al modificar caso" }),
+    };
   }
-  await connectToDatabase();
-  const { casoId, data } = JSON.parse(event.body!);
-  await Caso.findByIdAndUpdate(casoId, data);
-  await Log.create({
-    usuario: data.responsables || "Desconocido",
-    accion: `modificó el caso ${casoId}`,
-    fecha: new Date(),
-  });
-  return { statusCode: 200, body: "OK" };
 };

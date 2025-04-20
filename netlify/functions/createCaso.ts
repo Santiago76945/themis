@@ -1,46 +1,48 @@
 // netlify/functions/createCaso.ts
 
 import type { Handler } from "@netlify/functions";
-import { connectToDatabase } from "./db";
+import { connectDB } from "../../src/lib/mongoose";
 import mongoose from "mongoose";
-
-const CasoSchema = new mongoose.Schema({
-  cliente: { type: mongoose.Schema.Types.ObjectId, ref: "Cliente" },
-  referencia: String,
-  numeroExpediente: String,
-  prioridad: String,
-  descripcion: String,
-  tribunal: String,
-  etapaProcesal: String,
-  proximaAccion: String,
-  fechaProximaAccion: Date,
-  fechaInicioJuicio: Date,
-  responsables: String,
-}, { collection: "casos", timestamps: true });
-
-const LogSchema = new mongoose.Schema({
-  usuario: String,
-  accion: String,
-  fecha: Date,
-}, { collection: "logs" });
-
-const Caso = mongoose.models.Caso || mongoose.model("Caso", CasoSchema);
-const Log  = mongoose.models.Log  || mongoose.model("Log",  LogSchema);
+import { Caso } from "../../src/lib/models/Caso";
+import { CasoLog } from "../../src/lib/models/CasoLog";
 
 export const handler: Handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Método no permitido" };
+  try {
+    const { clienteId, data, userCode, userName } = JSON.parse(event.body || "{}");
+    if (!clienteId || !data || !userCode || !userName) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Faltan datos requeridos" }),
+      };
+    }
+
+    await connectDB();
+
+    const caso = new Caso({
+      clienteId,
+      ...data,
+      createdAt: new Date(),
+    });
+    await caso.save();
+
+    // Log
+    await CasoLog.create({
+      casoId: caso._id.toString(),
+      userCode,
+      userName,
+      action: `creó caso (${caso._id.toString()}) para cliente ${clienteId}`,
+      timestamp: new Date(),
+    });
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ caso }),
+    };
+  } catch (err: any) {
+    console.error("crearCaso error", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Error interno al crear caso" }),
+    };
   }
-  await connectToDatabase();
-  const { clienteId, data } = JSON.parse(event.body!);
-  const nuevoCaso = await Caso.create({ cliente: clienteId, ...data });
-  await Log.create({
-    usuario: data.responsables || "Desconocido",
-    accion: `creó el caso ${nuevoCaso._id}`,
-    fecha: new Date(),
-  });
-  return {
-    statusCode: 200,
-    body: JSON.stringify(nuevoCaso),
-  };
 };
