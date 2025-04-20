@@ -265,4 +265,7 @@ button, input, select, textarea {
   justify-items: center;
 }
 
-/* Uso: <nav class="grid-stretch">…</nav> */
+.btn + .btn {
+  margin-top: var(--space-2);
+}
+

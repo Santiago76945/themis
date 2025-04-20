@@ -2,13 +2,22 @@ themis-legal-assistant/
 ├── .netlify/
 │   └── functions/
 │       ├── auth.ts
+│       ├── createCaso.ts
+│       ├── crearClient.ts
 │       ├── createLawFirm.ts
 │       ├── createUserProfile.ts
+│       ├── deleteClient.ts
+│       ├── eliminarCaso.ts
+│       ├── getAbogados.ts
+│       ├── getClientLog.ts
+│       ├── getClients.ts
 │       ├── getInvitations.ts
+│       ├── getLogCasos.ts
 │       ├── getMyLawFirm.ts
 │       ├── getUserEmailByUniqueCode.ts
 │       ├── getUserProfile.ts
 │       ├── inviteToLawFirm.ts
+│       ├── modificarCaso.ts
 │       ├── respondInvitation.ts
 │       └── db.ts
 ├── .next/                         # (generado por Next.js)
@@ -49,6 +58,8 @@ themis-legal-assistant/
 │   │   ├── menu/
 │   │   │   ├── mi-estudio/
 │   │   │   │   └── page.tsx
+│   │   │   ├── casos/
+│   │   │   │   └── page.tsx
 │   │   │   └── page.tsx
 │   │   ├── register/
 │   │   │   └── page.tsx
@@ -59,21 +70,27 @@ themis-legal-assistant/
 │   │   ├── animatedTexts.json
 │   │   ├── ConsoleEffect.tsx
 │   │   ├── ConsoleEffectWrapper.tsx
+│   │   ├── ClientManager.tsx
+│   │   ├── GestionCasos.tsx
 │   │   ├── LoginForm.tsx
 │   │   ├── Menu.tsx
 │   │   └── MyLawFirm.tsx
 │   ├── context/
 │   │   └── AuthContext.tsx
 │   ├── lib/
+│   │   ├── api.ts
 │   │   ├── firebase.ts
 │   │   ├── firebaseAuth.ts
 │   │   ├── firebaseUser.ts
 │   │   ├── mongoose.ts
 │   │   └── models/
+│   │       ├── Caso.ts
+│   │       ├── CasoLog.ts
 │   │       ├── Invitation.ts
 │   │       └── LawFirm.ts
 │   ├── styles/
 │   │   ├── global.css
+│   │   ├── GestionCasos.module.css
 │   │   ├── LoginForm.module.css
 │   │   ├── Menu.module.css
 │   │   └── MyLawFirm.module.css

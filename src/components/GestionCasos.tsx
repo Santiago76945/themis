@@ -342,7 +342,7 @@ export default function GestionCasos({
         {/* Botones al pie */}
         <div className={styles.bottomActions}>
           <button className="btn btn-link" onClick={() => setShowLogs((v) => !v)}>
-            Ver registro de casos
+            Ver registro de actividad
           </button>
           <button className="btn btn-link" onClick={() => router.push("/menu")}>
             Volver al menú
