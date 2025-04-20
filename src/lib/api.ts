@@ -38,103 +38,109 @@ export interface Abogado {
   nombre: string;
 }
 
-const callFn = async (fn: string, opts?: RequestInit) => {
+/**
+ * Generic helper to call a Netlify Function and parse JSON.
+ */
+const callFn = async <T>(fn: string, opts?: RequestInit): Promise<T> => {
   const res = await fetch(`/.netlify/functions/${fn}`, opts);
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Error en ${fn}: ${res.status} ${res.statusText} – ${text}`);
   }
-  return res.json();
+  return res.json() as Promise<T>;
 };
 
 /**
- * Obtiene los clientes para un estudio (lawFirmCode)
+ * Obtiene los clientes para un estudio (lawFirmCode).
+ * Si la función no existe o responde 404, devuelve [].
  */
 export const getClientes = async (lawFirmCode: string): Promise<Cliente[]> => {
   try {
-    const { clients } = await callFn(`getClients?lawFirmCode=${lawFirmCode}`);
+    const { clients } = await callFn<{ clients: Cliente[] }>(
+      `getClients?lawFirmCode=${lawFirmCode}`
+    );
     return clients;
-  } catch (err: any) {
-    if (err.message.includes("404")) return [];
+  } catch (err: unknown) {
+    if (err instanceof Error && err.message.includes("404")) {
+      return [];
+    }
     throw err;
   }
 };
 
 /**
- * Obtiene los abogados para un estudio (lawFirmCode)
+ * Obtiene los abogados para un estudio (lawFirmCode).
  */
 export const getAbogados = async (lawFirmCode: string): Promise<Abogado[]> => {
-  const { abogados } = await callFn(`getAbogados?lawFirmCode=${lawFirmCode}`);
+  const { abogados } = await callFn<{ abogados: Abogado[] }>(
+    `getAbogados?lawFirmCode=${lawFirmCode}`
+  );
   return abogados;
 };
 
 /**
- * Crea un nuevo caso asociado a un cliente
+ * Crea un nuevo caso asociado a un cliente.
+ * Retorna la respuesta del servidor (por ejemplo, el objeto creado).
  */
 export const crearCaso = (
   clienteId: string,
   data: CasoData,
-  usuario: string,
-  nombreUsuario: string
-) =>
-  callFn("crearCaso", {
+  userCode: string,
+  userName: string
+): Promise<unknown> =>
+  callFn<unknown>("crearCaso", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      clienteId,
-      data,
-      userCode: usuario,
-      userName: nombreUsuario,
-    }),
+    body: JSON.stringify({ clienteId, data, userCode, userName }),
   });
 
 /**
- * Modifica un caso existente
+ * Modifica un caso existente.
  */
 export const modificarCaso = (
   casoId: string,
   data: CasoData,
-  usuario: string,
-  nombreUsuario: string
-) =>
-  callFn("modificarCaso", {
+  userCode: string,
+  userName: string
+): Promise<unknown> =>
+  callFn<unknown>("modificarCaso", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      casoId,
-      data,
-      userCode: usuario,
-      userName: nombreUsuario,
-    }),
+    body: JSON.stringify({ casoId, data, userCode, userName }),
   });
 
 /**
- * Elimina un caso por su ID
+ * Elimina un caso por su ID.
  */
 export const eliminarCaso = (
   casoId: string,
-  usuario: string,
-  nombreUsuario: string
-) =>
-  callFn("eliminarCaso", {
+  userCode: string,
+  userName: string
+): Promise<unknown> =>
+  callFn<unknown>("eliminarCaso", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      casoId,
-      userCode: usuario,
-      userName: nombreUsuario,
-    }),
+    body: JSON.stringify({ casoId, userCode, userName }),
   });
 
 /**
- * Obtiene el log de acciones de casos, formatea fecha y hora en 'es-AR'
+ * Raw shape of each log entry returned by el servidor.
+ */
+interface RawLog {
+  userName: string;
+  action: string;
+  timestamp: string;
+}
+
+/**
+ * Obtiene el log de acciones de casos y lo mapea a LogEntry.
  */
 export const getLogCasos = async (): Promise<LogEntry[]> => {
-  const { logs } = await callFn("getLogCasos");
-  return (logs as any[]).map((l) => ({
-    usuario: l.userName,
-    accion:  l.action,
-    fecha:   new Date(l.timestamp).toLocaleString("es-AR", {
+  const { logs } = await callFn<{ logs: RawLog[] }>("getLogCasos");
+  return logs.map(({ userName, action, timestamp }) => ({
+    usuario: userName,
+    accion: action,
+    fecha: new Date(timestamp).toLocaleString("es-AR", {
       timeZone: "America/Argentina/Cordoba",
     }),
   }));

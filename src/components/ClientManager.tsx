@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/Clients.module.css";
@@ -41,13 +41,15 @@ export default function ClientManager() {
   const [logs, setLogs] = useState<ClientLogEntry[]>([]);
   const [showLogs, setShowLogs] = useState(false);
 
-  const fetchClients = async () => {
+  // Carga inicial de clientes, memoizada para satisfy exhaustive-deps
+  const fetchClients = useCallback(async () => {
     if (!lawFirmCode) return;
     const res = await fetch(`/.netlify/functions/getClients?lawFirmCode=${lawFirmCode}`);
     const data = await res.json();
     setClients(data.clients || []);
-  };
+  }, [lawFirmCode]);
 
+  // Carga global de logs
   const fetchLogs = async () => {
     if (!lawFirmCode) return;
     const res = await fetch(`/.netlify/functions/getClientLog?lawFirmCode=${lawFirmCode}`);
@@ -56,16 +58,19 @@ export default function ClientManager() {
     setShowLogs(true);
   };
 
+  // Ejecuta fetchClients al montar y cuando cambie la firma
   useEffect(() => {
     fetchClients();
-  }, [lawFirmCode]);
+  }, [fetchClients]);
 
+  // Filtrar lista por nombre o apellido
   const filtered = clients.filter(
     (c) =>
       c.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.firstName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Seleccionar un cliente para edición
   const handleSelect = (c: Client) => {
     setSelected(c);
     setForm(c);
@@ -73,11 +78,13 @@ export default function ClientManager() {
     setShowLogs(false);
   };
 
+  // Cambios en formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Crear cliente
   const handleAdd = async () => {
     if (!form.firstName || !form.lastName) {
       alert("Nombre y Apellido son obligatorios");
@@ -98,6 +105,7 @@ export default function ClientManager() {
     fetchClients();
   };
 
+  // Actualizar cliente
   const handleUpdate = async () => {
     if (!selected) return;
     await fetch("/.netlify/functions/updateClient", {
@@ -116,6 +124,7 @@ export default function ClientManager() {
     fetchClients();
   };
 
+  // Eliminar cliente
   const handleDelete = async () => {
     if (!selected) return;
     if (!confirm(`¿Eliminar a ${selected.firstName} ${selected.lastName}?`)) return;
