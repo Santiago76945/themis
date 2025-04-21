@@ -2,18 +2,30 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+} from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { getMyLawFirm } from "@/lib/api";
+import type { Cliente, CasoData, LogEntry, LawFirm } from "@/lib/api/types";
 import styles from "@/styles/GestionCasos.module.css";
-import {
-  Cliente,
-  CasoData,
-  LogEntry,
-  Abogado,
-  getAbogados,
-} from "@/lib/api";
 
+/* ------------------------------------------------------------------ */
+/*  Tipos auxiliares                                                  */
+/* ------------------------------------------------------------------ */
+
+// Abogado tal como lo usaremos en la UI
+interface Abogado {
+  id: string;
+  nombre: string;
+}
+
+// Representación mínima de un caso para la grilla
 interface Caso {
   _id: string;
   clienteId: string;
@@ -27,6 +39,8 @@ interface Caso {
   fechaProximaAccion?: string;
   fechaInicioJuicio?: string;
   responsables?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface Props {
@@ -38,6 +52,10 @@ interface Props {
   log: LogEntry[];
 }
 
+/* ------------------------------------------------------------------ */
+/*  Componente principal                                              */
+/* ------------------------------------------------------------------ */
+
 export default function GestionCasos({
   clientes,
   casos = [],
@@ -48,40 +66,58 @@ export default function GestionCasos({
 }: Props) {
   const router = useRouter();
   const { userData } = useAuth();
-  const lawFirmCode = userData?.lawFirmCode || "";
+
+  const userCode = userData?.uniqueCode ?? "";
+
+  /* --------------------------  State  ----------------------------- */
 
   const [showForm, setShowForm] = useState(false);
-  const [clienteSel, setClienteSel] = useState("");
+  const [clienteSel, setClienteSel] = useState<string>("");
   const [form, setForm] = useState<CasoData>({});
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [priorityFilter, setPriorityFilter] = useState<"" | "Alta" | "Media" | "Baja">("");
   const [abogados, setAbogados] = useState<Abogado[]>([]);
   const [showLogs, setShowLogs] = useState(false);
 
-  // Carga de abogados usando lawFirmCode del contexto
-  useEffect(() => {
-    if (!lawFirmCode) return;
-    getAbogados(lawFirmCode)
-      .then(setAbogados)
-      .catch((err) => console.error("Error al obtener abogados:", err));
-  }, [lawFirmCode]);
+  /* --------------------  Cargar abogados del estudio  ------------- */
 
-  // Limpia si ya no hay clientes
   useEffect(() => {
-    if (!clientes.length) {
+    if (!userCode) return;
+
+    getMyLawFirm(userCode)
+      .then((firm: LawFirm) => {
+        const list: Abogado[] = firm.members.map((m) => ({
+          id: m.uniqueCode,
+          nombre: `${m.firstName} ${m.lastName}`,
+        }));
+        setAbogados(list);
+      })
+      .catch((err) =>
+        console.error("Error al obtener abogados desde getMyLawFirm:", err)
+      );
+  }, [userCode]);
+
+  /* ----  Reset del formulario si se borran todos los clientes  ---- */
+
+  useEffect(() => {
+    if (clientes.length === 0) {
       setClienteSel("");
       setShowForm(false);
     }
   }, [clientes]);
 
+  /* -------------------------  Handlers  --------------------------- */
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+    setForm((prev: CasoData) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!clienteSel) return;
     onCrear(clienteSel, form);
@@ -89,7 +125,8 @@ export default function GestionCasos({
     setShowForm(false);
   };
 
-  // Filtrado de casos
+  /* -------------------------  Filtros  ---------------------------- */
+
   const casosFiltrados = casos.filter((c) => {
     const cli = clientes.find((x) => x.id === c.clienteId);
     const matchName = cli
@@ -99,11 +136,14 @@ export default function GestionCasos({
     return matchName && matchPriority;
   });
 
+  /* --------------------------  Render  ---------------------------- */
+
   return (
     <div className="container">
       <div className="card">
-        {/* Header con botón de Añadir caso */}
-        <div className={styles.header}>
+
+        {/* ───────────  Encabezado  ─────────── */}
+        <header className={styles.header}>
           <h2 className={styles.title}>Gestión de Casos</h2>
           <button
             className="btn btn-secondary"
@@ -111,24 +151,22 @@ export default function GestionCasos({
           >
             {showForm ? "Cancelar" : "Añadir caso"}
           </button>
-        </div>
+        </header>
 
-        {/* Formulario */}
+        {/* ───────────  Formulario  ─────────── */}
         {showForm && (
           <div className="card-secondary">
-            <form
-              className={styles.form}
-              onSubmit={handleSubmit}
-            >
+            <form className={styles.form} onSubmit={handleSubmit}>
               {/* Cliente */}
               <div className={styles.field}>
-                <label htmlFor="cliente">Cliente</label>
+                <label htmlFor="cliente">Cliente*</label>
                 <select
                   id="cliente"
                   name="clienteId"
                   className="input"
                   value={clienteSel}
                   onChange={(e) => setClienteSel(e.target.value)}
+                  required
                 >
                   <option value="">-- seleccioná un cliente --</option>
                   {clientes.map((c) => (
@@ -151,7 +189,7 @@ export default function GestionCasos({
                 />
               </div>
 
-              {/* N° Expediente */}
+              {/* Número de expediente */}
               <div className={styles.field}>
                 <label htmlFor="numeroExpediente">N° Expediente</label>
                 <input
@@ -274,7 +312,7 @@ export default function GestionCasos({
                 </select>
               </div>
 
-              {/* Botón Crear */}
+              {/* Acciones del formulario */}
               <div className={styles.actionsForm}>
                 <button
                   type="submit"
@@ -288,7 +326,7 @@ export default function GestionCasos({
           </div>
         )}
 
-        {/* Filtros */}
+        {/* ───────────  Filtros  ─────────── */}
         <div className={styles.filters}>
           <input
             type="text"
@@ -313,7 +351,7 @@ export default function GestionCasos({
           </select>
         </div>
 
-        {/* Lista de Casos */}
+        {/* ───────────  Lista de casos  ─────────── */}
         <div className={styles.caseList}>
           {casosFiltrados.map((c) => {
             const cli = clientes.find((x) => x.id === c.clienteId);
@@ -324,13 +362,14 @@ export default function GestionCasos({
                     ? `${cli.firstName} ${cli.lastName}`
                     : "Cliente desconocido"}
                 </strong>
-                <p>Referencia: {c.referencia}</p>
-                <p>Expediente: {c.numeroExpediente}</p>
-                <p>Prioridad: {c.prioridad}</p>
-                <p>Etapa: {c.etapaProcesal}</p>
-                <p>Próx. Acción: {c.proximaAccion}</p>
-                <p>Inicio Juicio: {c.fechaInicioJuicio}</p>
-                <p>Responsable/s: {c.responsables}</p>
+                <p>Referencia: {c.referencia || "—"}</p>
+                <p>Expediente: {c.numeroExpediente || "—"}</p>
+                <p>Prioridad: {c.prioridad || "—"}</p>
+                <p>Etapa: {c.etapaProcesal || "—"}</p>
+                <p>Próx. Acción: {c.proximaAccion || "—"}</p>
+                <p>Inicio Juicio: {c.fechaInicioJuicio || "—"}</p>
+                <p>Responsable/s: {c.responsables || "—"}</p>
+
                 <div className={styles.caseActions}>
                   <button
                     className="btn btn-link"
@@ -348,20 +387,12 @@ export default function GestionCasos({
               </div>
             );
           })}
-          {casosFiltrados.length === 0 && <p>No se encontraron casos.</p>}
+          {casosFiltrados.length === 0 && (
+            <p className="mt-2">No se encontraron casos.</p>
+          )}
         </div>
 
-        {/* Botones al pie */}
-        <div className={styles.bottomActions}>
-          <button className="btn btn-link" onClick={() => setShowLogs((v) => !v)}>
-            Ver registro de actividad
-          </button>
-          <button className="btn btn-link" onClick={() => router.push("/menu")}>
-            Volver al menú
-          </button>
-        </div>
-
-        {/* Registro de Casos */}
+        {/* ───────────  Registro de actividad  ─────────── */}
         {showLogs && (
           <div className="card-secondary">
             <h3>Registro de Casos</h3>
@@ -369,7 +400,7 @@ export default function GestionCasos({
               <ul className={styles.logList}>
                 {log.map((entry, i) => (
                   <li key={i}>
-                    <small>{entry.fecha}</small>{" "}
+                    <small>{entry.fecha}</small> –{" "}
                     <strong>{entry.usuario}</strong> {entry.accion}
                   </li>
                 ))}
@@ -379,7 +410,24 @@ export default function GestionCasos({
             )}
           </div>
         )}
+
+        {/* ───────────  Acciones al pie  ─────────── */}
+        <footer className={styles.bottomActions}>
+          <button
+            className="btn btn-link"
+            onClick={() => setShowLogs((v) => !v)}
+          >
+            Ver registro de actividad
+          </button>
+          <button
+            className="btn btn-link"
+            onClick={() => router.push("/menu")}
+          >
+            Volver al menú
+          </button>
+        </footer>
       </div>
     </div>
   );
 }
+
