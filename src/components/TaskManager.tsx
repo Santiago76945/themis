@@ -1,5 +1,4 @@
 // src/components/TaskManager.tsx
-
 "use client";
 
 import React, {
@@ -25,13 +24,16 @@ import {
 } from "@/lib/api";
 import styles from "@/styles/TaskManager.module.css";
 
+// Definimos un alias de tipo para las dependencias
+type DependencyType = "espera" | "retraso";
+
 export default function TaskManager() {
   const router = useRouter();
   const { userData } = useAuth();
   const lawFirmCode = userData?.lawFirmCode || "";
   const userCode = userData?.uniqueCode || "";
-  const userName = `${userData?.firstName || ""} ${userData?.lastName || ""
-    }`.trim();
+  const userName = `${userData?.firstName || ""} ${userData?.lastName ||
+    ""}`.trim();
 
   const [clients, setClients] = useState<Cliente[]>([]);
   const [lawyers, setLawyers] = useState<Abogado[]>([]);
@@ -146,12 +148,12 @@ export default function TaskManager() {
       ...f,
       dependencies: list.find((d) => d.taskId === taskId)
         ? list.filter((d) => d.taskId !== taskId)
-        : [...list, { taskId, type: "espera" }],
+        : [...list, { taskId, type: "espera" as DependencyType }],
     }));
   };
   const changeDepType = (
     taskId: string,
-    type: "retraso" | "espera"
+    type: DependencyType
   ) => {
     setFormValues((f) => ({
       ...f,
@@ -383,8 +385,8 @@ export default function TaskManager() {
                   ))}
                 </div>
 
-                {/* Dependencias */}
-                <div className={styles.formField}>
+               {/* Dependencias */}
+               <div className={styles.formField}>
                   <label>Dependencias</label>
                   {tasks
                     .filter(t => t._id !== selectedTask?._id && t.estado !== "finalizada")
@@ -399,7 +401,7 @@ export default function TaskManager() {
                         {formValues.dependencies?.find(d => d.taskId === t._id) && (
                           <select
                             value={formValues.dependencies.find(d => d.taskId === t._id)?.type}
-                            onChange={e => changeDepType(t._id, e.target.value as any)}
+                            onChange={e => changeDepType(t._id, e.target.value as DependencyType)}
                           >
                             <option value="espera">Espera finalización</option>
                             <option value="retraso">Retrasa</option>
