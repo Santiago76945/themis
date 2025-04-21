@@ -29,9 +29,11 @@ interface ClientLogEntry {
 export default function ClientManager() {
   const router = useRouter();
   const { userData } = useAuth();
-  const lawFirmCode = userData?.uniqueCode || "";
-  const userCode     = userData?.uniqueCode || "";
-  const userName     = `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim();
+
+  // Ahora usamos lawFirmCode desde el contexto
+  const lawFirmCode = userData?.lawFirmCode || "";
+  const userCode    = userData?.uniqueCode   || "";
+  const userName    = `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim();
 
   const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,7 +43,7 @@ export default function ClientManager() {
   const [logs, setLogs] = useState<ClientLogEntry[]>([]);
   const [showLogs, setShowLogs] = useState(false);
 
-  // Carga inicial de clientes, memoizada para satisfy exhaustive-deps
+  // Carga inicial de clientes
   const fetchClients = useCallback(async () => {
     if (!lawFirmCode) return;
     const res = await fetch(`/.netlify/functions/getClients?lawFirmCode=${lawFirmCode}`);
@@ -58,7 +60,7 @@ export default function ClientManager() {
     setShowLogs(true);
   };
 
-  // Ejecuta fetchClients al montar y cuando cambie la firma
+  // Ejecuta fetchClients al montar y cuando cambie el estudio
   useEffect(() => {
     fetchClients();
   }, [fetchClients]);

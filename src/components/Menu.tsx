@@ -61,7 +61,7 @@ export default function Menu({ userData, onLogout }: MenuProps) {
     { label: "Mi estudio jurídico", icon: "/icons/office-icon.png", path: "/menu/mi-estudio", enabled: true },
     { label: "Gestión de clientes", icon: "/icons/clients-icon.png", path: "/menu/clientes", enabled: true },
     { label: "Gestión de casos", icon: "/icons/court-file-icon.png", path: "/menu/casos", enabled: true },
-    { label: "Gestion de tareas", icon: "/icons/tasks-icon.png", enabled: false },
+    { label: "Gestión de tareas", icon: "/icons/tasks-icon.png", path: "/menu/tasks", enabled: true },
     { label: "Finanzas del estudio", icon: "/icons/finances-icon.png", enabled: false },
     { label: "Agenda y audiencias", icon: "/icons/calendar-icon.png", enabled: false },
     { label: "Actualización de estados procesales", icon: "/icons/notifications-icon.png", enabled: false },
@@ -77,7 +77,7 @@ export default function Menu({ userData, onLogout }: MenuProps) {
         <header className={styles.menuHeader}>
           <h1 className={styles.menuTitle}>Dashboard</h1>
           <p className={styles.menuSubtitle}>
-          ¡Hola, Dr. {fullName}! Bienvenido a Themis.<br />
+            ¡Hola, Dr. {fullName}! Bienvenido a Themis.<br />
             Tu código de usuario es: <strong>{userCode || "SINCOD"}</strong>
           </p>
           <button className="btn btn-link" onClick={onLogout}>
@@ -86,14 +86,18 @@ export default function Menu({ userData, onLogout }: MenuProps) {
         </header>
 
         {invitations.length > 0 && (
-          <div className={`card-secondary ${styles.invitationsCard}`}>            
+          <div className={`card-secondary ${styles.invitationsCard}`}>
             <h3 className={styles.invitationHeader}>Invitaciones pendientes</h3>
             {invitations.map((inv) => (
               <div key={inv._id} className={styles.invitationItem}>
                 <span>Estudio {inv.lawFirmCode}</span>
                 <div className={styles.invitationActions}>
-                  <button className="btn btn-primary" onClick={() => handleRespond(inv._id, "accepted")}>Aceptar</button>
-                  <button className="btn btn-secondary" onClick={() => handleRespond(inv._id, "rejected")}>Rechazar</button>
+                  <button className="btn btn-primary" onClick={() => handleRespond(inv._id, "accepted")}>
+                    Aceptar
+                  </button>
+                  <button className="btn btn-secondary" onClick={() => handleRespond(inv._id, "rejected")}>
+                    Rechazar
+                  </button>
                 </div>
               </div>
             ))}
@@ -108,7 +112,13 @@ export default function Menu({ userData, onLogout }: MenuProps) {
                 disabled={!item.enabled}
                 onClick={() => item.enabled && item.path && router.push(item.path)}
               >
-                <Image src={item.icon} alt={`${item.label} icon`} width={48} height={48} className={styles.icon} />
+                <Image
+                  src={item.icon}
+                  alt={`${item.label} icon`}
+                  width={48}
+                  height={48}
+                  className={styles.icon}
+                />
                 <span className={styles.menuLabel}>{item.label}</span>
                 {!item.enabled && <div className={styles.badge}>Próximamente</div>}
               </button>

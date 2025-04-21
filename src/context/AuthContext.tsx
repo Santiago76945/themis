@@ -21,22 +21,18 @@ export interface UserData {
   uniqueCode?: string;
   firstName?: string;
   lastName?: string;
-  lawFirmCode?: string;      // <-- agregado
+  lawFirmCode?: string;   // <— Lo llenaremos aquí
 }
 
 export interface AuthContextProps {
   user: User | null;
   userData: UserData | null;
-  uniqueCode?: string;
-  lawFirmCode?: string;      // <-- agregado
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
   user: null,
   userData: null,
-  uniqueCode: undefined,
-  lawFirmCode: undefined,
   logout: async () => {},
 });
 
@@ -44,43 +40,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const auth = getAuth(app);
-
   const extendedProfileRef = useRef<UserData | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+
       if (currentUser) {
-        await currentUser.reload();
-        if (!extendedProfileRef.current) {
-          const mongoProfile = await fetchUserProfileFromMongo(currentUser.uid);
-          let newData: UserData;
+        // 1) Recarga perfil desde Mongo
+        const mongoProfile = await fetchUserProfileFromMongo(currentUser.uid);
+        if (!mongoProfile) return;
 
-          if (mongoProfile?.firstName && mongoProfile?.lastName) {
-            const fullName = `${mongoProfile.firstName} ${mongoProfile.lastName}`;
-            newData = {
-              uid: mongoProfile.uid,
-              email: mongoProfile.email,
-              displayName: fullName,
-              uniqueCode: mongoProfile.uniqueCode,
-              firstName: mongoProfile.firstName,
-              lastName: mongoProfile.lastName,
-              lawFirmCode: mongoProfile.lawFirmCode,  // <-- agregado
-            };
+        const baseData: UserData = {
+          uid: mongoProfile.uid,
+          email: mongoProfile.email,
+          displayName: `${mongoProfile.firstName} ${mongoProfile.lastName}`,
+          uniqueCode: mongoProfile.uniqueCode,
+          firstName: mongoProfile.firstName,
+          lastName: mongoProfile.lastName,
+          // lawFirmCode: lo rellenamos seguidamente
+        };
+
+        // 2) Llamamos a getMyLawFirm para obtener código de estudio
+        try {
+          const res = await fetch(
+            `/.netlify/functions/getMyLawFirm?userCode=${encodeURIComponent(
+              mongoProfile.uniqueCode
+            )}`
+          );
+          if (res.ok) {
+            const { firm } = await res.json();
+            baseData.lawFirmCode = firm.code;
           } else {
-            newData = {
-              uid: currentUser.uid,
-              email: currentUser.email || "",
-              displayName: currentUser.displayName || "",
-              uniqueCode: currentUser.uid.slice(-6).toUpperCase(),
-              // lawFirmCode queda undefined si no viene de Mongo
-            };
+            console.warn("No se encontró estudio para:", mongoProfile.uniqueCode);
           }
-
-          setUserData(newData);
-          extendedProfileRef.current = newData;
+        } catch (err) {
+          console.error("Error al obtener estudio:", err);
         }
+
+        setUserData(baseData);
+        extendedProfileRef.current = baseData;
       } else {
+        // usuario salió
         setUserData(null);
         extendedProfileRef.current = null;
       }
@@ -94,15 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        userData,
-        uniqueCode: userData?.uniqueCode,
-        lawFirmCode: userData?.lawFirmCode,  // <-- expuesto aquí
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, userData, logout }}>
       {children}
     </AuthContext.Provider>
   );

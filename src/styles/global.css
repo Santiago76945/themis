@@ -269,3 +269,8 @@ button, input, select, textarea {
   margin-top: var(--space-2);
 }
 
+/* Evita scroll horizontal en toda la app */
+html, body {
+  overflow-x: hidden;
+}
+

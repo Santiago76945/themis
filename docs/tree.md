@@ -5,8 +5,10 @@ themis-legal-assistant/
 │       ├── createCaso.ts
 │       ├── crearClient.ts
 │       ├── createLawFirm.ts
+│       ├── createTask.ts             ← NUEVO
 │       ├── createUserProfile.ts
 │       ├── deleteClient.ts
+│       ├── deleteTask.ts             ← NUEVO
 │       ├── eliminarCaso.ts
 │       ├── getAbogados.ts
 │       ├── getClientLog.ts
@@ -14,13 +16,14 @@ themis-legal-assistant/
 │       ├── getInvitations.ts
 │       ├── getLogCasos.ts
 │       ├── getMyLawFirm.ts
+│       ├── getTaskLog.ts             ← NUEVO
+│       ├── getTasks.ts               ← NUEVO
 │       ├── getUserEmailByUniqueCode.ts
 │       ├── getUserProfile.ts
 │       ├── inviteToLawFirm.ts
 │       ├── modificarCaso.ts
 │       ├── respondInvitation.ts
 │       └── db.ts
-├── .next/                         # (generado por Next.js)
 ├── docs/
 │   ├── etapas-de-desarrollo.md
 │   ├── funciones.md
@@ -49,6 +52,7 @@ themis-legal-assistant/
 │       ├── office-icon.png
 │       ├── report-icon.png
 │       ├── task-icons.png
+│       ├── tasks-icon.png            ← NUEVO (asegurar presencia)
 │       ├── users-icon.png
 │       └── writing-icon.png
 ├── src/
@@ -60,6 +64,8 @@ themis-legal-assistant/
 │   │   │   │   └── page.tsx
 │   │   │   ├── casos/
 │   │   │   │   └── page.tsx
+│   │   │   ├── tasks/                ← NUEVO
+│   │   │   │   └── page.tsx          ← NUEVO
 │   │   │   └── page.tsx
 │   │   ├── register/
 │   │   │   └── page.tsx
@@ -74,11 +80,12 @@ themis-legal-assistant/
 │   │   ├── GestionCasos.tsx
 │   │   ├── LoginForm.tsx
 │   │   ├── Menu.tsx
-│   │   └── MyLawFirm.tsx
+│   │   ├── MyLawFirm.tsx
+│   │   └── TaskManager.tsx           ← NUEVO
 │   ├── context/
 │   │   └── AuthContext.tsx
 │   ├── lib/
-│   │   ├── api.ts
+│   │   ├── api.ts                    ← MODIFICADO (sección tareas)
 │   │   ├── firebase.ts
 │   │   ├── firebaseAuth.ts
 │   │   ├── firebaseUser.ts
@@ -87,13 +94,16 @@ themis-legal-assistant/
 │   │       ├── Caso.ts
 │   │       ├── CasoLog.ts
 │   │       ├── Invitation.ts
-│   │       └── LawFirm.ts
+│   │       ├── LawFirm.ts
+│   │       ├── Task.ts               ← NUEVO
+│   │       └── TaskLog.ts            ← NUEVO
 │   ├── styles/
 │   │   ├── global.css
 │   │   ├── GestionCasos.module.css
 │   │   ├── LoginForm.module.css
 │   │   ├── Menu.module.css
-│   │   └── MyLawFirm.module.css
+│   │   ├── MyLawFirm.module.css
+│   │   └── TaskManager.module.css   ← NUEVO
 │   └── utils/
 │       └── generateCode.ts
 ├── .env.local

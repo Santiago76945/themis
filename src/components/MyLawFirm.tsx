@@ -44,12 +44,14 @@ export default function MyLawFirm() {
     // Obtener el estudio completo con perfiles de miembros
     fetch(`/.netlify/functions/getMyLawFirm?userCode=${encodeURIComponent(userCode)}`)
       .then((res) => res.json())
-      .then((data) => setFirm(data.firm || null));
+      .then((data) => setFirm(data.firm || null))
+      .catch((err) => console.error("Error al obtener estudio:", err));
 
     // Obtener invitaciones pendientes
     fetch(`/.netlify/functions/getInvitations?userCode=${encodeURIComponent(userCode)}`)
       .then((res) => res.json())
-      .then((data) => setPendingInvites(data.invites || []));
+      .then((data) => setPendingInvites(data.invites || []))
+      .catch((err) => console.error("Error al obtener invitaciones:", err));
   }, [userCode]);
 
   const createFirm = () => {
@@ -59,34 +61,42 @@ export default function MyLawFirm() {
     }
     fetch("/.netlify/functions/createLawFirm", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newFirmName, managerCode: userCode }),
     })
       .then((res) => res.json())
-      .then((data) => setFirm(data.lawfirm));
+      .then((data) => setFirm(data.lawfirm))
+      .catch((err) => console.error("Error al crear estudio:", err));
   };
 
   const sendInvite = () => {
     if (!inviteCode.trim() || !firm) return;
     fetch("/.netlify/functions/inviteToLawFirm", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         lawFirmCode: firm.code,
         invitedUserCode: inviteCode,
         managerCode: userCode,
       }),
-    }).then(() => {
-      alert("Invitación enviada");
-      setInviteCode("");
-    });
+    })
+      .then(() => {
+        alert("Invitación enviada");
+        setInviteCode("");
+      })
+      .catch((err) => console.error("Error al enviar invitación:", err));
   };
 
   const respondInvite = (id: string, resp: "accepted" | "rejected") => {
     fetch("/.netlify/functions/respondInvitation", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ invitationId: id, response: resp }),
-    }).then(() =>
-      setPendingInvites((inv) => inv.filter((i) => i._id !== id))
-    );
+    })
+      .then(() =>
+        setPendingInvites((inv) => inv.filter((i) => i._id !== id))
+      )
+      .catch((err) => console.error("Error al responder invitación:", err));
   };
 
   const removeMember = (memberCode: string) => {
@@ -175,9 +185,7 @@ export default function MyLawFirm() {
 
             {pendingInvites.length > 0 && (
               <div className="card-secondary">
-                <h3 className={styles.sectionSubtitle}>
-                  Invitaciones pendientes
-                </h3>
+                <h3 className={styles.sectionSubtitle}>Invitaciones pendientes</h3>
                 {pendingInvites.map((inv) => (
                   <div key={inv._id} className={styles.invitationItem}>
                     <span>{inv.lawFirmCode}</span>

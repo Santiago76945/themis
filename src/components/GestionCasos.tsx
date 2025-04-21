@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import styles from "@/styles/GestionCasos.module.css";
 import {
   Cliente,
@@ -34,7 +35,7 @@ interface Props {
   onCrear: (clienteId: string, data: CasoData) => void;
   onModificar: (casoId: string, data: CasoData) => void;
   onEliminar: (casoId: string) => void;
-  log: LogEntry[];              // ← Agregado aquí
+  log: LogEntry[];
 }
 
 export default function GestionCasos({
@@ -43,9 +44,12 @@ export default function GestionCasos({
   onCrear,
   onModificar,
   onEliminar,
-  log,                        // ← Y recibimos la prop
+  log,
 }: Props) {
   const router = useRouter();
+  const { userData } = useAuth();
+  const lawFirmCode = userData?.lawFirmCode || "";
+
   const [showForm, setShowForm] = useState(false);
   const [clienteSel, setClienteSel] = useState("");
   const [form, setForm] = useState<CasoData>({});
@@ -54,15 +58,20 @@ export default function GestionCasos({
   const [abogados, setAbogados] = useState<Abogado[]>([]);
   const [showLogs, setShowLogs] = useState(false);
 
-  // Carga de abogados
+  // Carga de abogados usando lawFirmCode del contexto
   useEffect(() => {
-    const code = clientes[0]?.lawFirmCode;
-    if (code) getAbogados(code).then(setAbogados).catch(console.error);
-  }, [clientes]);
+    if (!lawFirmCode) return;
+    getAbogados(lawFirmCode)
+      .then(setAbogados)
+      .catch((err) => console.error("Error al obtener abogados:", err));
+  }, [lawFirmCode]);
 
   // Limpia si ya no hay clientes
   useEffect(() => {
-    if (!clientes.length) setClienteSel("");
+    if (!clientes.length) {
+      setClienteSel("");
+      setShowForm(false);
+    }
   }, [clientes]);
 
   const handleChange = (
@@ -72,7 +81,8 @@ export default function GestionCasos({
     setForm((f) => ({ ...f, [name]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!clienteSel) return;
     onCrear(clienteSel, form);
     setForm({});
@@ -82,7 +92,9 @@ export default function GestionCasos({
   // Filtrado de casos
   const casosFiltrados = casos.filter((c) => {
     const cli = clientes.find((x) => x.id === c.clienteId);
-    const matchName = cli ? cli.lastName.toLowerCase().includes(searchTerm.toLowerCase()) : false;
+    const matchName = cli
+      ? cli.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+      : false;
     const matchPriority = !priorityFilter || c.prioridad === priorityFilter;
     return matchName && matchPriority;
   });
@@ -106,14 +118,14 @@ export default function GestionCasos({
           <div className="card-secondary">
             <form
               className={styles.form}
-              onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
+              onSubmit={handleSubmit}
             >
               {/* Cliente */}
               <div className={styles.field}>
                 <label htmlFor="cliente">Cliente</label>
                 <select
                   id="cliente"
-                  name="cliente"
+                  name="clienteId"
                   className="input"
                   value={clienteSel}
                   onChange={(e) => setClienteSel(e.target.value)}
