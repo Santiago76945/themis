@@ -2,7 +2,12 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  ChangeEvent,
+  FormEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -24,14 +29,15 @@ export default function TaskManager() {
   const router = useRouter();
   const { userData } = useAuth();
   const lawFirmCode = userData?.lawFirmCode || "";
-  const userCode    = userData?.uniqueCode   || "";
-  const userName    = `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim();
+  const userCode = userData?.uniqueCode || "";
+  const userName = `${userData?.firstName || ""} ${userData?.lastName || ""
+    }`.trim();
 
-  const [clients, setClients]     = useState<Cliente[]>([]);
-  const [lawyers, setLawyers]     = useState<Abogado[]>([]);
-  const [tasks, setTasks]         = useState<Task[]>([]);
-  const [logs, setLogs]           = useState<TaskLogEntry[]>([]);
-  const [showForm, setShowForm]   = useState(false);
+  const [clients, setClients] = useState<Cliente[]>([]);
+  const [lawyers, setLawyers] = useState<Abogado[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [logs, setLogs] = useState<TaskLogEntry[]>([]);
+  const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
@@ -113,18 +119,22 @@ export default function TaskManager() {
     setShowForm(false);
   };
 
-  const handleChange = (e: React.ChangeEvent<any>) => {
+  const handleChange = (
+    e: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormValues(f => ({ ...f, [name]: value }));
+    setFormValues((f) => ({ ...f, [name]: value }));
   };
 
   // Co‑responsables
   const toggleCoResponsable = (id: string) => {
     const list = formValues.coResponsables || [];
-    setFormValues(f => ({
+    setFormValues((f) => ({
       ...f,
       coResponsables: list.includes(id)
-        ? list.filter(x => x !== id)
+        ? list.filter((x) => x !== id)
         : [...list, id],
     }));
   };
@@ -132,17 +142,20 @@ export default function TaskManager() {
   // Dependencias
   const toggleDependency = (taskId: string) => {
     const list = formValues.dependencies || [];
-    setFormValues(f => ({
+    setFormValues((f) => ({
       ...f,
-      dependencies: list.find(d => d.taskId === taskId)
-        ? list.filter(d => d.taskId !== taskId)
+      dependencies: list.find((d) => d.taskId === taskId)
+        ? list.filter((d) => d.taskId !== taskId)
         : [...list, { taskId, type: "espera" }],
     }));
   };
-  const changeDepType = (taskId: string, type: "retraso" | "espera") => {
-    setFormValues(f => ({
+  const changeDepType = (
+    taskId: string,
+    type: "retraso" | "espera"
+  ) => {
+    setFormValues((f) => ({
       ...f,
-      dependencies: (f.dependencies || []).map(d =>
+      dependencies: (f.dependencies || []).map((d) =>
         d.taskId === taskId ? { ...d, type } : d
       ),
     }));
@@ -151,26 +164,30 @@ export default function TaskManager() {
   // Adjuntos
   const addAttachment = () => {
     const list = formValues.attachments || [];
-    setFormValues(f => ({
+    setFormValues((f) => ({
       ...f,
       attachments: [...list, { url: "", description: "" }],
     }));
   };
-  const updateAttachment = (idx: number, field: "url" | "description", val: string) => {
-    setFormValues(f => {
+  const updateAttachment = (
+    idx: number,
+    field: "url" | "description",
+    val: string
+  ) => {
+    setFormValues((f) => {
       const list = f.attachments || [];
       list[idx] = { ...list[idx], [field]: val };
       return { ...f, attachments: [...list] };
     });
   };
   const removeAttachment = (idx: number) => {
-    setFormValues(f => ({
+    setFormValues((f) => ({
       ...f,
       attachments: (f.attachments || []).filter((_, i) => i !== idx),
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formValues.name) {
       alert("El nombre de la tarea es obligatorio.");
@@ -180,7 +197,17 @@ export default function TaskManager() {
       if (isEditing && selectedTask) {
         await modificarTask(
           selectedTask._id!,
-          formValues as any,
+          formValues as Partial<
+            Omit<
+              Task,
+              | "_id"
+              | "lawFirmCode"
+              | "createdBy"
+              | "createdByName"
+              | "createdAt"
+              | "updatedAt"
+            >
+          >,
           userCode,
           userName,
           lawFirmCode
@@ -223,7 +250,10 @@ export default function TaskManager() {
             <button className="btn btn-secondary" onClick={fetchLogs}>
               Ver registro de actividad
             </button>
-            <button className="btn btn-link" onClick={() => router.push("/menu")}>
+            <button
+              className="btn btn-link"
+              onClick={() => router.push("/menu")}
+            >
               ← Volver al menú
             </button>
           </div>
@@ -387,7 +417,7 @@ export default function TaskManager() {
                     type="date"
                     name="deadline"
                     className="input"
-                    value={formValues.deadline?.slice(0,10) || ""}
+                    value={formValues.deadline?.slice(0, 10) || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -430,6 +460,32 @@ export default function TaskManager() {
                   <button type="button" className="btn btn-secondary" onClick={addAttachment}>
                     + Agregar adjunto
                   </button>
+                </div>
+
+                {/* Fecha y hora de creación */}
+                <div className={styles.formField}>
+                  <label>Creada el</label>
+                  <input
+                    type="text"
+                    className="input"
+                    value={
+                      formValues.createdAt
+                        ? new Date(formValues.createdAt).toLocaleString("es-AR", { timeZone: "America/Argentina/Cordoba" })
+                        : ""
+                    }
+                    disabled
+                  />
+                </div>
+
+                {/* Creado por */}
+                <div className={styles.formField}>
+                  <label>Creado por</label>
+                  <input
+                    type="text"
+                    className="input"
+                    value={formValues.createdByName || ""}
+                    disabled
+                  />
                 </div>
 
                 {/* Estado */}

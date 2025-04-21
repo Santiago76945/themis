@@ -4,7 +4,6 @@
 
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   Cliente,
@@ -24,7 +23,6 @@ const GestionCasos = dynamic(() => import("@/components/GestionCasos"), {
 });
 
 export default function CasosPage() {
-  const router = useRouter();
   const { userData } = useAuth();
 
   const lawFirmCode = userData?.lawFirmCode || "";
