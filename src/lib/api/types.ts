@@ -153,3 +153,14 @@ export interface Cliente {
     members: Profile[];
   }
   
+/**
+ * Invitación a un estudio jurídico
+ */
+export interface Invitation {
+  _id: string;
+  lawFirmCode: string;
+  invitedUserCode: string;       // el código único de 6 dígitos
+  status: 'pending' | 'accepted' | 'rejected';
+  createdAt: string;             // timestamp en ISO
+}
+

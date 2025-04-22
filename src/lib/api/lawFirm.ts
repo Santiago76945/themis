@@ -1,7 +1,7 @@
 // src/lib/api/lawFirm.ts
 
 import { callFn } from "./utils";
-import { LawFirm, Invitation } from "./types";
+import type { LawFirm, Invitation } from "./types";
 
 /**
  * Recupera los datos del estudio jurídico al que pertenece el usuario.
@@ -34,8 +34,8 @@ export function inviteToLawFirm(
   lawFirmCode: string,
   invitedUserCode: string,
   managerCode: string
-): Promise<void> {
-  return callFn<void>("inviteToLawFirm", {
+): Promise<{ invitation: Invitation }> {
+  return callFn<{ invitation: Invitation }>("inviteToLawFirm", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ lawFirmCode, invitedUserCode, managerCode }),
@@ -48,8 +48,8 @@ export function inviteToLawFirm(
 export function respondInvitation(
   invitationId: string,
   response: "accepted" | "rejected"
-): Promise<void> {
-  return callFn<void>("respondInvitation", {
+): Promise<{ invitation: Invitation }> {
+  return callFn<{ invitation: Invitation }>("respondInvitation", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ invitationId, response }),

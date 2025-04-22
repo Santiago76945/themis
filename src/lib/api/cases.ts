@@ -1,7 +1,7 @@
 // src/lib/api/cases.ts
 
 import { callFn } from "./utils";
-import { Caso, CasoData, CaseLogEntry } from "./types";
+import { Caso, CasoData, LogEntry } from "./types";
 
 /**
  * Obtiene todos los casos de un estudio.
@@ -63,7 +63,7 @@ export function eliminarCaso(
 /**
  * Obtiene el log de operaciones sobre casos.
  */
-export async function getLogCasos(): Promise<CaseLogEntry[]> {
-  const { logs } = await callFn<{ logs: CaseLogEntry[] }>("getLogCasos");
+export async function getLogCasos(): Promise<LogEntry[]> {
+  const { logs } = await callFn<{ logs: LogEntry[] }>("getLogCasos");
   return logs;
 }

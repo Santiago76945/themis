@@ -1,7 +1,7 @@
 // src/lib/api/clients.ts
 
 import { callFn } from "./utils";
-import type { Cliente, ClientLogEntry } from "./types";
+import type { Cliente, LogEntry } from "./types";
 
 /**
  * Obtiene la lista de clientes de un estudio jurídico.
@@ -41,8 +41,8 @@ export async function createClient(
  */
 export async function getClientLog(
   lawFirmCode: string
-): Promise<ClientLogEntry[]> {
-  const { logs } = await callFn<{ logs: ClientLogEntry[] }>(
+): Promise<LogEntry[]> {
+  const { logs } = await callFn<{ logs: LogEntry[] }>(
     `getClientLog?lawFirmCode=${encodeURIComponent(lawFirmCode)}`
   );
   return logs;

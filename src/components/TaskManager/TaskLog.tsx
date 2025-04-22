@@ -3,7 +3,7 @@
 "use client";
 
 import React from "react";
-import { TaskLogEntry } from "./types";
+import { TaskLogEntry } from "@/lib/api/types"
 import styles from "@/styles/TaskManager.module.css";
 
 export interface TaskLogProps {
