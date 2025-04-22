@@ -117,8 +117,8 @@ button, input, select, textarea {
   background-color: var(--color-surface);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  width: 100%;          /* lleno todo el ancho disponible */
-  max-width: none;      /* quitamos límite de ancho */
+  width: 100%;
+  max-width: none;
   margin: var(--space-4) auto;
   position: relative;
   z-index: 10;
@@ -153,6 +153,20 @@ button, input, select, textarea {
   background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
 }
 
+/* Lógica de botones global (cerrojo .actions) */
+.actions {
+  display: flex;
+  flex-wrap: wrap;       /* Permite que bajen de línea en pantallas angostas */
+  gap: 0.5rem;            /* Espacio horizontal y vertical */
+  row-gap: 0.5rem;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.actions .btn {
+  margin-left: 0 !important;  /* Anula márgenes para alinear todos igual */
+}
+
 /* Formularios */
 .input {
   width: 100%;
@@ -185,18 +199,7 @@ button, input, select, textarea {
   }
 }
 
-/* Tarjetas generales (primarias) */
-.card {
-  background-color: var(--color-surface);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  width: 100%;
-  margin: var(--space-4) auto;
-  padding: var(--space-4);
-  text-align: left;
-}
-
-/* Tarjetas secundarias (sub‐cards) */
+/* Tarjetas secundarias (sub‑cards) */
 .card-secondary {
   background-color: var(--color-surface);
   border-radius: 8px;
@@ -227,36 +230,6 @@ button, input, select, textarea {
 }
 
 /* Sub‑cards reutilizables en toda la app */
-.card-secondary {
-  background-color: var(--color-surface);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  padding: var(--space-3);
-  margin: var(--space-3) 0;
-  text-align: left;
-}
-
-/* Separación automática entre botones adyacentes */
-.btn + .btn {
-  margin-left: var(--space-2);
-}
-
-/* Estilo de botón‑enlace ligero, para “Volver al menú” u otras acciones */
-.btn-link {
-  display: inline-block;
-  background: none;
-  border: 1px solid var(--color-accent);
-  color: var(--color-accent);
-  padding: var(--space-2) var(--space-3);
-  border-radius: 8px;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-.btn-link:hover {
-  background: var(--gradient-end);
-  transform: translateY(-2px);
-}
-
-/* Aplique el mismo “stretch & center” a cualquier grid de cards */
 .grid-stretch {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -265,12 +238,25 @@ button, input, select, textarea {
   justify-items: center;
 }
 
-.btn + .btn {
-  margin-top: var(--space-2);
-}
-
 /* Evita scroll horizontal en toda la app */
 html, body {
   overflow-x: hidden;
 }
 
+/* Botones uniformes en toda la app */
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-link {
+  /* Fuerza un mismo alto */
+  height: 2.5rem;
+
+  /* Usa inline‑flex para centrar vertical y horizontalmente */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Normaliza padding y tamaño de texto */
+  padding: 0 1.5rem;
+  font-size: 1rem;
+}
