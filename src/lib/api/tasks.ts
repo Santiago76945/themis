@@ -1,7 +1,7 @@
 // src/lib/api/tasks.ts
 
 import { callFn } from "./utils";
-import { Task, TaskLogEntry } from "./types";
+import type { Task, TaskLogEntry } from "./types";
 
 /**
  * Obtiene todas las tareas de un estudio (lawFirmCode).
@@ -35,11 +35,20 @@ export function crearTask(
 
 /**
  * Modifica una tarea existente.
+ * Ahora admite cualquier campo opcional, incluyendo `dependencies`.
  */
 export function modificarTask(
   id: string,
   updates: Partial<
-    Omit<Task, "_id" | "lawFirmCode" | "createdBy" | "createdByName" | "createdAt" | "updatedAt">
+    Omit<
+      Task,
+      | "_id"
+      | "lawFirmCode"
+      | "createdBy"
+      | "createdByName"
+      | "createdAt"
+      | "updatedAt"
+    >
   >,
   userCode: string,
   userName: string,

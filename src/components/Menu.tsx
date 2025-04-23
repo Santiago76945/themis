@@ -62,12 +62,12 @@ export default function Menu({ userData, onLogout }: MenuProps) {
     { label: "Gestión de clientes", icon: "/icons/clients-icon.png", path: "/menu/clientes", enabled: true },
     { label: "Gestión de casos", icon: "/icons/court-file-icon.png", path: "/menu/casos", enabled: true },
     { label: "Gestión de tareas", icon: "/icons/tasks-icon.png", path: "/menu/tasks", enabled: true },
+    { label: "Informes", icon: "/icons/notifications-icon.png", enabled: false },
     { label: "Finanzas del estudio", icon: "/icons/finances-icon.png", enabled: false },
-    { label: "Agenda y audiencias", icon: "/icons/calendar-icon.png", enabled: false },
+    { label: "Agenda", icon: "/icons/calendar-icon.png", enabled: false },
     { label: "Actualización de estados procesales", icon: "/icons/notifications-icon.png", enabled: false },
     { label: "Creación de escritos", icon: "/icons/logo-redaccion.png", enabled: false },
     { label: "Cartas documento y telegramas", icon: "/icons/logo-tareas.png", enabled: false },
-    { label: "Reportes y estadísticas", icon: "/icons/report-icon.png", enabled: false },
     { label: "Gestión de usuarios y roles", icon: "/icons/users-icon.png", enabled: false },
   ];
 

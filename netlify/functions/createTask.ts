@@ -9,13 +9,23 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   }
+
   const { lawFirmCode, userCode, userName, task } = JSON.parse(event.body || "{}");
+
+  // validación básica
   if (!lawFirmCode || !userCode || !userName || !task?.name) {
     return { statusCode: 400, body: JSON.stringify({ error: "Faltan parámetros requeridos" }) };
   }
 
   await connectDB();
-  const created = await Task.create({ ...task, lawFirmCode });
+
+  // Ahora pasamos createdBy y createdByName al crear
+  const created = await Task.create({
+    ...task,
+    lawFirmCode,
+    createdBy: userCode,
+    createdByName: userName,
+  });
 
   await TaskLog.create({
     taskId: String(created._id),

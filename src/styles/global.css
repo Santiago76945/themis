@@ -260,3 +260,10 @@ html, body {
   padding: 0 1.5rem;
   font-size: 1rem;
 }
+
+/* Asegura que los <option> de todos los .input tengan fondo oscuro y texto claro */
+.input option,
+.input optgroup {
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+}

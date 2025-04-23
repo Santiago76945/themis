@@ -274,6 +274,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     (d) => d.taskId === t._id
                   ) && (
                     <select
+                    className="input"
                       value={
                         formValues.dependencies.find(
                           (d) => d.taskId === t._id
