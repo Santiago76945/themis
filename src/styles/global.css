@@ -10,7 +10,8 @@
  * - Componentes: botones, inputs y enlaces reutilizan las variables y transiciones homogéneas.
  */
 
-/* Variables */
+/* Variables CSS */
+
 :root {
   /* Colores */
   --color-background: #121212;
@@ -48,7 +49,8 @@
   --breakpoint-xl: 1280px;
 }
 
-/* Reset básico */
+/* Reset Global */
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -70,7 +72,26 @@ body {
   line-height: 1.5;
 }
 
-/* Elementos base */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Tipografía y elementos base */
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-on-surface);
+  background-color: var(--color-background);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-weight: var(--font-weight-bold);
   color: var(--color-on-surface);
@@ -105,14 +126,23 @@ button, input, select, textarea {
   outline: none;
 }
 
-/* Container principal con márgenes equilibrados */
+
+/* Layout y contenedores */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
 .container {
   margin: var(--space-4) var(--space-2);
   padding: var(--space-4) var(--space-2);
   text-align: center;
 }
 
-/* Tarjetas generales */
+
+/* Componentes – Tarjetas */
 .card {
   background-color: var(--color-surface);
   border-radius: 12px;
@@ -123,83 +153,9 @@ button, input, select, textarea {
   position: relative;
   z-index: 10;
   text-align: left;
+  padding: var(--space-4);
 }
 
-/* Divisor */
-.divider {
-  border: none;
-  border-top: 1px solid var(--color-divider);
-  margin: var(--space-4) 0;
-}
-
-/* Botones */
-.btn {
-  display: inline-block;
-  padding: var(--space-2) var(--space-3);
-  border-radius: 8px;
-  cursor: pointer;
-  background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
-  color: var(--color-accent);
-  text-align: center;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
-}
-
-.btn-secondary {
-  background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
-}
-
-/* Lógica de botones global (cerrojo .actions) */
-.actions {
-  display: flex;
-  flex-wrap: wrap;       /* Permite que bajen de línea en pantallas angostas */
-  gap: 0.5rem;            /* Espacio horizontal y vertical */
-  row-gap: 0.5rem;
-  width: 100%;
-  justify-content: flex-start;
-}
-
-.actions .btn {
-  margin-left: 0 !important;  /* Anula márgenes para alinear todos igual */
-}
-
-/* Formularios */
-.input {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background-color: #2c2c2e;
-  color: var(--color-on-surface);
-  transition: border 0.2s ease, box-shadow 0.2s ease;
-  margin-bottom: var(--space-3);
-}
-
-.input:focus {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 5px var(--color-accent);
-}
-
-/* Utilidades de espaciado */
-.mt-1 { margin-top: var(--space-1) !important; }
-.mt-2 { margin-top: var(--space-2) !important; }
-.mt-3 { margin-top: var(--space-3) !important; }
-.mb-1 { margin-bottom: var(--space-1) !important; }
-.mb-2 { margin-bottom: var(--space-2) !important; }
-.mb-3 { margin-bottom: var(--space-3) !important; }
-
-/* Responsividad */
-@media (max-width: var(--breakpoint-md)) {
-  .container {
-    padding: var(--space-3) var(--space-2);
-  }
-}
-
-/* Tarjetas secundarias (sub‑cards) */
 .card-secondary {
   background-color: var(--color-surface);
   border-radius: 8px;
@@ -209,14 +165,43 @@ button, input, select, textarea {
   text-align: left;
 }
 
-/* Espacio automático entre botones adyacentes */
+/* Componentes – Botones */
+.btn {
+  display: inline-block;
+  padding: var(--space-2) var(--space-3);
+  
+  border-radius: 8px;
+  cursor: pointer;
+  background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+  color: var(--color-accent);
+  text-align: center;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+}
+.btn-secondary {
+  background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+}
+/* Uniformidad de altura y centrado interno */
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-link {
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.5rem;
+  font-size: 1rem;
+}
+/* Separación automática entre botones */
 .btn + .btn {
   margin-left: var(--space-2);
 }
-
-/* Botón ligero para enlaces de acción */
+/* Estilos para botones de enlace */
 .btn-link {
-  display: inline-block;
   background: none;
   border: 1px solid var(--color-accent);
   color: var(--color-accent);
@@ -228,42 +213,122 @@ button, input, select, textarea {
   background: var(--gradient-end);
   transform: translateY(-2px);
 }
-
-/* Sub‑cards reutilizables en toda la app */
-.grid-stretch {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-4);
-  align-items: stretch;
-  justify-items: center;
+/* Contenedor de acciones (botones agrupados) */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.actions .btn {
+  margin-left: 0 !important;
 }
 
-/* Evita scroll horizontal en toda la app */
-html, body {
-  overflow-x: hidden;
+
+/* Formularios e inputs */
+.input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: #2c2c2e;
+  color: var(--color-on-surface);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: var(--space-3);
 }
-
-/* Botones uniformes en toda la app */
-.btn,
-.btn-primary,
-.btn-secondary,
-.btn-link {
-  /* Fuerza un mismo alto */
-  height: 2.5rem;
-
-  /* Usa inline‑flex para centrar vertical y horizontalmente */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  /* Normaliza padding y tamaño de texto */
-  padding: 0 1.5rem;
-  font-size: 1rem;
+.input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 5px var(--color-accent);
 }
-
-/* Asegura que los <option> de todos los .input tengan fondo oscuro y texto claro */
+/* Opciones en selects con fondo oscuro */
 .input option,
 .input optgroup {
   background-color: var(--color-surface);
   color: var(--color-on-surface);
 }
+/* Estructura de formularios */
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+}
+.field label {
+  margin-bottom: var(--space-1);
+  font-weight: var(--font-weight-bold);
+}
+.actionsForm {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-2);
+}
+/* Buscador */
+.search {
+  margin: var(--space-4) 0 var(--space-2);
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+/* Utilidades (espaciado y helpers) */
+/* Márgenes rápidas */
+.mt-1 { margin-top: var(--space-1) !important; }
+.mt-2 { margin-top: var(--space-2) !important; }
+.mt-3 { margin-top: var(--space-3) !important; }
+.mb-1 { margin-bottom: var(--space-1) !important; }
+.mb-2 { margin-bottom: var(--space-2) !important; }
+.mb-3 { margin-bottom: var(--space-3) !important; }
+/* Evita scroll horizontal */
+html, body {
+  overflow-x: hidden;
+}
+
+
+/* Divisores y enlaces */
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-divider);
+  margin: var(--space-4) 0;
+}
+a {
+  color: var(--color-link);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+a:hover {
+  color: var(--color-link-hover);
+}
+
+/* Modal overlay */
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-4);
+  z-index: 1000;
+}
+
+/* Modal content box */
+.modalContent {
+  background-color: var(--color-surface);
+  border-radius: 8px;
+  padding: var(--space-4);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Footer inside modal */
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+}
+

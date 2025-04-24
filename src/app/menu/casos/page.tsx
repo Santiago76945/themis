@@ -18,7 +18,7 @@ import {
   Caso,                 // ← Interfaz de caso
 } from "@/lib/api";
 
-const GestionCasos = dynamic(() => import("@/components/GestionCasos"), {
+const GestionCasos = dynamic(() => import("@/components/GestionCasos/GestionCasos"), {
   ssr: false,
 });
 

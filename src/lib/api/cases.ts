@@ -22,7 +22,7 @@ export function crearCaso(
   userCode: string,
   userName: string
 ): Promise<{ caso: Caso }> {
-  return callFn<{ caso: Caso }>("crearCaso", {
+  return callFn<{ caso: Caso }>("createCaso", {           // ← aquí
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ clienteId, data, userCode, userName }),
