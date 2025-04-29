@@ -1,41 +1,60 @@
 // src/lib/models/Client.ts
 
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-export interface IClient {
+export interface ClientDocument extends Document {
+  id: string;
   lawFirmCode: string;
-  id: string;              // "01", "02", ...
-  firstName: string;
-  lastName: string;
+  name: string;
   dni?: string;
   phone?: string;
   email?: string;
   address?: string;
-  additionalInfo?: string;
+  dateOfAlta?: string;
+  clientObservations?: string;
   createdAt: Date;
+  updatedAt: Date;
 }
 
-const ClientSchema = new mongoose.Schema<IClient>(
+const ClientSchema = new Schema<ClientDocument>(
   {
-    lawFirmCode:   { type: String, required: true, index: true },
-    id:            { type: String, required: true },
-    firstName:     { type: String, required: true },
-    lastName:      { type: String, required: true },
-    dni:           { type: String },
-    phone:         { type: String },
-    email:         { type: String },
-    address:       { type: String },
-    additionalInfo:{ type: String },
+    id: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    lawFirmCode: {
+      type: String,
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    dni: {
+      type: String
+    },
+    phone: {
+      type: String
+    },
+    email: {
+      type: String
+    },
+    address: {
+      type: String
+    },
+    dateOfAlta: {
+      type: String
+    },
+    clientObservations: {
+      type: String
+    }
   },
   {
-    collection: 'clients',
-    timestamps: { createdAt: 'createdAt', updatedAt: false }
+    timestamps: true
   }
 );
 
-// Índice único por estudio + id
-ClientSchema.index({ lawFirmCode: 1, id: 1 }, { unique: true });
-
 export const Client =
   mongoose.models.Client ||
-  mongoose.model<IClient>('Client', ClientSchema);
+  mongoose.model<ClientDocument>('Client', ClientSchema);

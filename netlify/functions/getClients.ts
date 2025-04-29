@@ -7,41 +7,29 @@ import { Client } from '../../src/lib/models/Client';
 export const handler: Handler = async (event) => {
   const { lawFirmCode } = event.queryStringParameters || {};
   if (!lawFirmCode) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Falta lawFirmCode' }),
-    };
+    return { statusCode: 400, body: JSON.stringify({ error: 'Falta lawFirmCode' }) };
   }
+
   try {
     await connectDB();
-    const clients = await Client.find({ lawFirmCode })
-      .sort({ createdAt: 1 })
-      .lean();
-
-    // Formatear la respuesta para exponer sólo los campos necesarios
-    const formatted = clients.map(c => ({
+    const docs = await Client.find({ lawFirmCode }).sort({ name: 1 });
+    const clients = docs.map(c => ({
       id: c.id,
-      firstName: c.firstName,
-      lastName: c.lastName,
+      name: c.name,
       dni: c.dni,
       phone: c.phone,
       email: c.email,
       address: c.address,
-      additionalInfo: c.additionalInfo || '',
+      dateOfAlta: c.dateOfAlta,
+      clientObservations: c.clientObservations,
       lawFirmCode: c.lawFirmCode,
       createdAt: c.createdAt,
       updatedAt: c.updatedAt,
     }));
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ clients: formatted }),
-    };
+    return { statusCode: 200, body: JSON.stringify({ clients }) };
   } catch (err: any) {
     console.error('getClients error', err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Error interno' }),
-    };
+    return { statusCode: 500, body: JSON.stringify({ error: 'Error interno' }) };
   }
 };

@@ -15,6 +15,7 @@ interface FormProps {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   onSubmit: (e: FormEvent) => void;
+  isEditing: boolean;  // <-- agregado
 }
 
 export const Form: React.FC<FormProps> = ({
@@ -24,6 +25,7 @@ export const Form: React.FC<FormProps> = ({
   onClienteChange,
   onChange,
   onSubmit,
+  isEditing,         // <-- agregado
 }) => {
   return (
     <div className="card-secondary">
@@ -183,7 +185,7 @@ export const Form: React.FC<FormProps> = ({
             className="btn btn-primary"
             disabled={!clienteSel}
           >
-            Crear caso
+            {isEditing ? "Guardar cambios" : "Crear caso"}
           </button>
         </div>
       </form>

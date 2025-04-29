@@ -4,35 +4,35 @@
  * Cliente para el estudio jurídico
  */
 export interface Cliente {
-    id: string;
-    firstName: string;
-    lastName: string;
-    dni: string;
-    phone: string;
-    email: string;
-    address: string;
-    additionalInfo?: string;
-    lawFirmCode: string;
-    createdAt: string;
-    updatedAt: string;
-  }
-  
-  /**
-   * Datos de un caso
-   */
-  export interface CasoData {
-    referencia?: string;
-    numeroExpediente?: string;
-    prioridad?: "Alta" | "Media" | "Baja";
-    descripcion?: string;
-    tribunal?: string;
-    etapaProcesal?: string;
-    proximaAccion?: string;
-    fechaProximaAccion?: string;
-    fechaInicioJuicio?: string;
-    responsables?: string;
-  }
-  
+  id: string;
+  name: string;                // Nombre o razón social (obligatorio)
+  dni?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  dateOfAlta?: string;
+  clientObservations?: string;
+  lawFirmCode: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Datos de un caso
+ */
+export interface CasoData {
+  referencia?: string;
+  numeroExpediente?: string;
+  prioridad?: "Alta" | "Media" | "Baja";
+  descripcion?: string;
+  tribunal?: string;
+  etapaProcesal?: string;
+  proximaAccion?: string;
+  fechaProximaAccion?: string;
+  fechaInicioJuicio?: string;
+  responsables?: string;
+}
+
   /**
    * Entrada de log genérico
    */

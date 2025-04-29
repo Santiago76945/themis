@@ -7,23 +7,17 @@ import type { Cliente, LogEntry } from "./types";
  * Obtiene la lista de clientes de un estudio jurídico.
  */
 export async function getClientes(lawFirmCode: string): Promise<Cliente[]> {
-  try {
-    const { clients } = await callFn<{ clients: Cliente[] }>(
-      `getClients?lawFirmCode=${encodeURIComponent(lawFirmCode)}`
-    );
-    return clients;
-  } catch (err: any) {
-    if (err.message.includes("404")) {
-      return [];
-    }
-    throw err;
-  }
+  const { clients } = await callFn<{ clients: Cliente[] }>(
+    `getClients?lawFirmCode=${encodeURIComponent(lawFirmCode)}`
+  );
+  return clients;
 }
 
 /**
  * Crea un nuevo cliente.
  */
 export async function createClient(
+  lawFirmCode: string,
   data: Omit<Cliente, "createdAt" | "updatedAt">,
   userCode: string,
   userName: string
@@ -31,7 +25,7 @@ export async function createClient(
   const { client } = await callFn<{ client: Cliente }>("createClient", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ data, userCode, userName }),
+    body: JSON.stringify({ lawFirmCode, userCode, userName, data }),
   });
   return client;
 }
