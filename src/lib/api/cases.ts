@@ -1,7 +1,7 @@
 // src/lib/api/cases.ts
 
 import { callFn } from "./utils";
-import { Caso, CasoData, LogEntry } from "./types";
+import type { Caso, CasoData, LogEntry } from "./types";
 
 /**
  * Obtiene todos los casos de un estudio.
@@ -22,7 +22,7 @@ export function crearCaso(
   userCode: string,
   userName: string
 ): Promise<{ caso: Caso }> {
-  return callFn<{ caso: Caso }>("createCaso", {           // ← aquí
+  return callFn<{ caso: Caso }>("createCaso", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ clienteId, data, userCode, userName }),
@@ -30,15 +30,15 @@ export function crearCaso(
 }
 
 /**
- * Modifica un caso existente.
+ * Actualiza un caso existente.
  */
-export function modificarCaso(
+export function updateCaso(
   casoId: string,
   data: CasoData,
   userCode: string,
   userName: string
 ): Promise<{ caso: Caso }> {
-  return callFn<{ caso: Caso }>("modificarCaso", {
+  return callFn<{ caso: Caso }>("updateCaso", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ casoId, data, userCode, userName }),
@@ -48,12 +48,12 @@ export function modificarCaso(
 /**
  * Elimina un caso por su ID.
  */
-export function eliminarCaso(
+export function deleteCaso(
   casoId: string,
   userCode: string,
   userName: string
 ): Promise<{ success: boolean }> {
-  return callFn<{ success: boolean }>("eliminarCaso", {
+  return callFn<{ success: boolean }>("deleteCaso", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ casoId, userCode, userName }),

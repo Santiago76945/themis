@@ -15,7 +15,7 @@ interface FormProps {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   onSubmit: (e: FormEvent) => void;
-  isEditing: boolean;  // <-- agregado
+  isEditing: boolean;
 }
 
 export const Form: React.FC<FormProps> = ({
@@ -25,16 +25,16 @@ export const Form: React.FC<FormProps> = ({
   onClienteChange,
   onChange,
   onSubmit,
-  isEditing,         // <-- agregado
+  isEditing,
 }) => {
   return (
     <div className="card-secondary">
       <form className={styles.form} onSubmit={onSubmit}>
         {/* Cliente */}
         <div className={styles.field}>
-          <label htmlFor="cliente">Cliente*</label>
+          <label htmlFor="clienteId">Cliente*</label>
           <select
-            id="cliente"
+            id="clienteId"
             name="clienteId"
             className="input"
             value={clienteSel}
@@ -44,45 +44,159 @@ export const Form: React.FC<FormProps> = ({
             <option value="">-- seleccioná un cliente --</option>
             {clientes.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.firstName} {c.lastName}
+                {c.name}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Referencia */}
+        {/* Rol */}
         <div className={styles.field}>
-          <label htmlFor="referencia">Referencia</label>
+          <label htmlFor="rol">Rol*</label>
           <input
-            id="referencia"
-            name="referencia"
+            id="rol"
+            name="rol"
+            type="text"
             className="input"
-            value={formValues.referencia || ""}
+            value={formValues.rol || ""}
+            onChange={onChange}
+            required
+          />
+        </div>
+
+        {/* Caso propio o delegado */}
+        <div className={styles.field}>
+          <label htmlFor="caseType">Tipo de Caso*</label>
+          <select
+            id="caseType"
+            name="caseType"
+            className="input"
+            value={formValues.caseType || ""}
+            onChange={onChange}
+            required
+          >
+            <option value="">-- seleccioná tipo --</option>
+            <option value="propio">Caso propio</option>
+            <option value="delegado">Delegado</option>
+          </select>
+        </div>
+
+        {/* Honorarios estimados */}
+        <div className={styles.field}>
+          <label htmlFor="honorariosEstimados">Honorarios estimados</label>
+          <input
+            id="honorariosEstimados"
+            name="honorariosEstimados"
+            type="number"
+            step="0.01"
+            className="input"
+            value={formValues.honorariosEstimados || ""}
             onChange={onChange}
           />
         </div>
 
-        {/* Número de expediente */}
+        {/* Referencia: Descripción */}
         <div className={styles.field}>
-          <label htmlFor="numeroExpediente">N° Expediente</label>
+          <label htmlFor="referencia">Referencia*</label>
+          <input
+            id="referencia"
+            name="referencia"
+            type="text"
+            className="input"
+            value={formValues.referencia || ""}
+            onChange={onChange}
+            required
+          />
+        </div>
+
+        {/* Número de Expediente */}
+        <div className={styles.field}>
+          <label htmlFor="numeroExpediente">Número de Expediente</label>
           <input
             id="numeroExpediente"
             name="numeroExpediente"
+            type="text"
             className="input"
             value={formValues.numeroExpediente || ""}
             onChange={onChange}
           />
         </div>
 
+        {/* Carátula */}
+        <div className={styles.field}>
+          <label htmlFor="caratula">Carátula</label>
+          <input
+            id="caratula"
+            name="caratula"
+            type="text"
+            className="input"
+            value={formValues.caratula || ""}
+            onChange={onChange}
+          />
+        </div>
+
+        {/* Juzgado / Tribunal */}
+        <div className={styles.field}>
+          <label htmlFor="tribunal">Juzgado / Tribunal</label>
+          <input
+            id="tribunal"
+            name="tribunal"
+            type="text"
+            className="input"
+            value={formValues.tribunal || ""}
+            onChange={onChange}
+          />
+        </div>
+
+        {/* Estado */}
+        <div className={styles.field}>
+          <label htmlFor="estado">Estado</label>
+          <input
+            id="estado"
+            name="estado"
+            type="text"
+            className="input"
+            value={formValues.estado || ""}
+            onChange={onChange}
+          />
+        </div>
+
+        {/* Próxima tarea */}
+        <div className={styles.field}>
+          <label htmlFor="proximaTarea">Próxima tarea</label>
+          <input
+            id="proximaTarea"
+            name="proximaTarea"
+            type="text"
+            className="input"
+            value={formValues.proximaTarea || ""}
+            onChange={onChange}
+          />
+        </div>
+
+        {/* Fecha próxima tarea */}
+        <div className={styles.field}>
+          <label htmlFor="fechaProximaTarea">Fecha próxima tarea</label>
+          <input
+            id="fechaProximaTarea"
+            name="fechaProximaTarea"
+            type="date"
+            className="input"
+            value={formValues.fechaProximaTarea || ""}
+            onChange={onChange}
+          />
+        </div>
+
         {/* Prioridad */}
         <div className={styles.field}>
-          <label htmlFor="prioridad">Prioridad</label>
+          <label htmlFor="prioridad">Prioridad*</label>
           <select
             id="prioridad"
             name="prioridad"
             className="input"
             value={formValues.prioridad || ""}
             onChange={onChange}
+            required
           >
             <option value="">--</option>
             <option value="Alta">Alta</option>
@@ -91,89 +205,15 @@ export const Form: React.FC<FormProps> = ({
           </select>
         </div>
 
-        {/* Descripción */}
+        {/* Observaciones */}
         <div className={styles.fieldFull}>
-          <label htmlFor="descripcion">Descripción</label>
+          <label htmlFor="observaciones">Observaciones</label>
           <textarea
-            id="descripcion"
-            name="descripcion"
+            id="observaciones"
+            name="observaciones"
             rows={3}
             className="input"
-            value={formValues.descripcion || ""}
-            onChange={onChange}
-          />
-        </div>
-
-        {/* Tribunal */}
-        <div className={styles.field}>
-          <label htmlFor="tribunal">Tribunal</label>
-          <input
-            id="tribunal"
-            name="tribunal"
-            className="input"
-            value={formValues.tribunal || ""}
-            onChange={onChange}
-          />
-        </div>
-
-        {/* Etapa procesal */}
-        <div className={styles.field}>
-          <label htmlFor="etapaProcesal">Etapa Procesal Actual</label>
-          <input
-            id="etapaProcesal"
-            name="etapaProcesal"
-            className="input"
-            value={formValues.etapaProcesal || ""}
-            onChange={onChange}
-          />
-        </div>
-
-        {/* Próxima acción */}
-        <div className={styles.field}>
-          <label htmlFor="proximaAccion">Próxima Acción Esperada</label>
-          <input
-            id="proximaAccion"
-            name="proximaAccion"
-            className="input"
-            value={formValues.proximaAccion || ""}
-            onChange={onChange}
-          />
-        </div>
-
-        {/* Fecha próxima acción */}
-        <div className={styles.field}>
-          <label htmlFor="fechaProximaAccion">Fecha Próx. Acción</label>
-          <input
-            id="fechaProximaAccion"
-            name="fechaProximaAccion"
-            type="date"
-            className="input"
-            value={formValues.fechaProximaAccion || ""}
-            onChange={onChange}
-          />
-        </div>
-
-        {/* Fecha inicio juicio */}
-        <div className={styles.field}>
-          <label htmlFor="fechaInicioJuicio">Fecha Inicio Juicio</label>
-          <input
-            id="fechaInicioJuicio"
-            name="fechaInicioJuicio"
-            type="date"
-            className="input"
-            value={formValues.fechaInicioJuicio || ""}
-            onChange={onChange}
-          />
-        </div>
-
-        {/* Responsable/s */}
-        <div className={styles.field}>
-          <label htmlFor="responsables">Responsable/s</label>
-          <input
-            id="responsables"
-            name="responsables"
-            className="input"
-            value={formValues.responsables || ""}
+            value={formValues.observaciones || ""}
             onChange={onChange}
           />
         </div>
@@ -183,9 +223,15 @@ export const Form: React.FC<FormProps> = ({
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={!clienteSel}
+            disabled={
+              !clienteSel ||
+              !formValues.rol ||
+              !formValues.caseType ||
+              !formValues.referencia ||
+              !formValues.prioridad
+            }
           >
-            {isEditing ? "Guardar cambios" : "Crear caso"}
+            {isEditing ? "Guardar Cambios" : "Crear Caso"}
           </button>
         </div>
       </form>

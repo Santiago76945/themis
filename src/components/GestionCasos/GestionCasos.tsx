@@ -35,7 +35,7 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
   const { userData } = useAuth();
   const userCode = userData?.uniqueCode ?? "";
 
-  // Estado para crear vs editar
+  // Mostrar formulario y modo edición
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedCaso, setSelectedCaso] = useState<Caso | null>(null);
@@ -44,6 +44,7 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
   const [clienteSel, setClienteSel] = useState("");
   const [formValues, setFormValues] = useState<CasoData>({});
 
+  // Filtros de lista
   const [searchTerm, setSearchTerm] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<"" | "Alta" | "Media" | "Baja">("");
   const [showLogs, setShowLogs] = useState(false);
@@ -53,39 +54,52 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
     getMyLawFirm(userCode).catch(console.error);
   }, [userCode]);
 
-  // Abre formulario en modo edición
   const openEdit = (c: Caso) => {
     setSelectedCaso(c);
     setClienteSel(c.clienteId);
-    setFormValues({ ...c });
+    setFormValues({ 
+      clienteId: c.clienteId,
+      rol: c.rol,
+      caseType: c.caseType,
+      honorariosEstimados: c.honorariosEstimados,
+      referencia: c.referencia,
+      numeroExpediente: c.numeroExpediente,
+      caratula: c.caratula,
+      tribunal: c.tribunal,
+      estado: c.estado,
+      proximaTarea: c.proximaTarea,
+      fechaProximaTarea: c.fechaProximaTarea,
+      prioridad: c.prioridad,
+      observaciones: c.observaciones,
+    });
     setIsEditing(true);
     setShowForm(true);
   };
 
-  // Maneja cambio de cliente en form
   const handleClienteChange = (value: string) => {
     setClienteSel(value);
     setFormValues(prev => ({ ...prev, clienteId: value }));
   };
 
-  // Maneja cambios en inputs, selects, textarea
-  const handleChange = (e: ChangeEvent<HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormValues(prev => ({ ...prev, [name]: value }));
   };
 
-  // Al enviar el form, determina crear o modificar
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!clienteSel) return;
 
+    const payload: CasoData = { ...formValues, clienteId: clienteSel };
     if (isEditing && selectedCaso) {
-      onModificar(selectedCaso._id, formValues);
+      onModificar(selectedCaso._id, payload);
     } else {
-      onCrear(clienteSel, formValues);
+      onCrear(clienteSel, payload);
     }
 
-    // reset
+    // Reset
     setFormValues({});
     setClienteSel("");
     setIsEditing(false);
@@ -93,11 +107,10 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
     setShowForm(false);
   };
 
-  // Filtrado de casos
   const casosFiltrados = casos.filter(c => {
     const cli = clientes.find(x => x.id === c.clienteId);
     const matchName = cli
-      ? cli.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+      ? cli.name.toLowerCase().includes(searchTerm.toLowerCase())
       : false;
     const matchPriority = !priorityFilter || c.prioridad === priorityFilter;
     return matchName && matchPriority;

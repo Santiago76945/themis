@@ -1,4 +1,4 @@
-// netlify/functions/eliminarCaso.ts
+// netlify/functions/deleteCaso.ts
 
 import type { Handler } from "@netlify/functions";
 import { connectDB } from "../../src/lib/mongoose";
@@ -16,27 +16,23 @@ export const handler: Handler = async (event) => {
     }
 
     await connectDB();
-
-    const deleted = await Caso.findByIdAndDelete(casoId);
-    if (!deleted) {
-      return { statusCode: 404, body: JSON.stringify({ error: "Caso no encontrado" }) };
+    const caso = await Caso.findOneAndDelete({ _id: casoId });
+    if (caso) {
+      await CasoLog.create({
+        lawFirmCode: caso.lawFirmCode,
+        caseId: caso._id,
+        userName,
+        action: `eliminó caso “${caso.referencia}”`,
+        timestamp: new Date(),
+      });
     }
-
-    // Log
-    await CasoLog.create({
-      casoId,
-      userCode,
-      userName,
-      action: `eliminó caso (${casoId})`,
-      timestamp: new Date(),
-    });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Caso eliminado" }),
+      body: JSON.stringify({ success: true }),
     };
   } catch (err: any) {
-    console.error("eliminarCaso error", err);
+    console.error("deleteCaso error", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Error interno al eliminar caso" }),

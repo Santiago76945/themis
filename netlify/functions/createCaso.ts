@@ -8,7 +8,17 @@ import { CasoLog } from "../../src/lib/models/CasoLog";
 export const handler: Handler = async (event) => {
   try {
     const { clienteId, data, userCode, userName } = JSON.parse(event.body || "{}");
-    if (!clienteId || !data || !userCode || !userName) {
+    // Validaciones de campos obligatorios
+    if (
+      !clienteId ||
+      !data ||
+      !data.rol ||
+      !data.caseType ||
+      !data.referencia ||
+      !data.prioridad ||
+      !userCode ||
+      !userName
+    ) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Faltan datos requeridos" }),
@@ -16,24 +26,28 @@ export const handler: Handler = async (event) => {
     }
 
     await connectDB();
-
-    // Creamos y guardamos el caso
-    const caso = new Caso({
+    const caso = await Caso.create({
       clienteId,
-      ...data,
-      createdAt: new Date(),
+      rol: data.rol,
+      caseType: data.caseType,
+      honorariosEstimados: data.honorariosEstimados,
+      referencia: data.referencia,
+      numeroExpediente: data.numeroExpediente,
+      caratula: data.caratula,
+      tribunal: data.tribunal,
+      estado: data.estado,
+      proximaTarea: data.proximaTarea,
+      fechaProximaTarea: data.fechaProximaTarea,
+      prioridad: data.prioridad,
+      observaciones: data.observaciones,
+      lawFirmCode: data.lawFirmCode,      // si tu esquema lo incluye
     });
-    await caso.save();
 
-    // Convertimos el _id a string de forma segura
-    const casoIdStr = String(caso._id);
-
-    // Registramos en el log
     await CasoLog.create({
-      casoId:   casoIdStr,
-      userCode,
+      lawFirmCode: caso.lawFirmCode,
+      caseId: caso._id,
       userName,
-      action:   `creó caso (${casoIdStr}) para cliente ${clienteId}`,
+      action: `creó caso “${data.referencia}”`,
       timestamp: new Date(),
     });
 
@@ -42,7 +56,7 @@ export const handler: Handler = async (event) => {
       body: JSON.stringify({ caso }),
     };
   } catch (err: any) {
-    console.error("crearCaso error", err);
+    console.error("createCaso error", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Error interno al crear caso" }),

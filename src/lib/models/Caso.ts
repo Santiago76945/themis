@@ -1,58 +1,55 @@
 // src/lib/models/Caso.ts
 
-import mongoose, { Document, Model } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
-/**
- * Interfaz TypeScript para un caso
- */
-export interface ICaso extends Document {
+export interface CasoDocument extends Document {
+  lawFirmCode: string;
   clienteId: string;
-  referencia?: string;
+  rol: string;
+  caseType: "propio" | "delegado";
+  honorariosEstimados?: number;
+  referencia: string;
   numeroExpediente?: string;
-  prioridad?: "Alta" | "Media" | "Baja";
-  descripcion?: string;
+  caratula?: string;
   tribunal?: string;
-  etapaProcesal?: string;
-  proximaAccion?: string;
-  fechaProximaAccion?: Date;
-  fechaInicioJuicio?: Date;
-  responsables?: string;
+  estado?: string;
+  proximaTarea?: string;
+  fechaProximaTarea?: string;
+  prioridad: "Alta" | "Media" | "Baja";
+  observaciones?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-/**
- * Definición del esquema de casos
- */
-const casoSchema = new mongoose.Schema<ICaso>(
+const CasoSchema = new Schema<CasoDocument>(
   {
-    clienteId: {
+    lawFirmCode: { type: String, required: true },
+    clienteId: { type: String, required: true },
+    rol: { type: String, required: true },
+    caseType: {
       type: String,
+      enum: ["propio", "delegado"],
       required: true,
     },
-    referencia: String,
-    numeroExpediente: String,
+    honorariosEstimados: { type: Number },
+    referencia: { type: String, required: true },
+    numeroExpediente: { type: String },
+    caratula: { type: String },
+    tribunal: { type: String },
+    estado: { type: String },
+    proximaTarea: { type: String },
+    fechaProximaTarea: { type: String },
     prioridad: {
       type: String,
       enum: ["Alta", "Media", "Baja"],
+      required: true,
     },
-    descripcion: String,
-    tribunal: String,
-    etapaProcesal: String,
-    proximaAccion: String,
-    fechaProximaAccion: Date,
-    fechaInicioJuicio: Date,
-    responsables: String,
+    observaciones: { type: String },
   },
   {
-    timestamps: true,       // crea createdAt y updatedAt
-    collection: "casos",
+    timestamps: true,
   }
 );
 
-/**
- * Exportación del modelo
- */
-export const Caso: Model<ICaso> =
-  (mongoose.models.Caso as Model<ICaso>) ||
-  mongoose.model<ICaso>("Caso", casoSchema);
+export const Caso =
+  mongoose.models.Caso || mongoose.model<CasoDocument>("Caso", CasoSchema);

@@ -7,12 +7,12 @@
  * @returns The parsed JSON response typed as T.
  * @throws If the response is not ok, throws an Error containing status and response text.
  */
+
 export async function callFn<T>(fn: string, opts?: RequestInit): Promise<T> {
-    const res = await fetch(`/.netlify/functions/${fn}`, opts);
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Error en ${fn}: ${res.status} ${res.statusText} – ${text}`);
-    }
-    return (await res.json()) as T;
+  const res = await fetch(`/.netlify/functions/${fn}`, opts);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Error en ${fn}: ${res.status} ${res.statusText} – ${text}`);
   }
-  
+  return (await res.json()) as T;
+}
