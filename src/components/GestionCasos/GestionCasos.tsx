@@ -7,7 +7,6 @@ import React, {
   useEffect,
   ChangeEvent,
   FormEvent,
-  useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -42,13 +41,13 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
   const { userData } = useAuth();
   const userCode = userData?.uniqueCode ?? "";
 
-  // mostrar formulario / modal / edición
+  // estados para formulario y vistas
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedCaso, setSelectedCaso] = useState<Caso | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
-  // valores del formulario como parcial
+  // datos del formulario
   const [clienteSel, setClienteSel] = useState("");
   const [formValues, setFormValues] = useState<Partial<CasoData>>({});
 
@@ -58,7 +57,7 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
   >("");
   const [showLogs, setShowLogs] = useState(false);
 
-  // carga lawFirmCode si necesita
+  // obtener lawFirmCode si hace falta
   useEffect(() => {
     if (!userCode) return;
     getMyLawFirm(userCode).catch(console.error);
@@ -74,7 +73,6 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
     setShowLogs(false);
   };
 
-  // abre formulario en modo edición
   const openEdit = (c: Caso) => {
     setSelectedCaso(c);
     setClienteSel(c.clienteId);
@@ -105,17 +103,22 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
     setShowLogs(false);
   };
 
-  const closeDetails = () => {
-    setShowDetails(false);
-  };
+  const closeDetails = () => setShowDetails(false);
 
+  // *******************
+  // CORRECCIONES CLAVE
+  // *******************
+
+  // Sólo actualiza clienteSel; el payload lleva formValues por separado
   const handleClienteChange = (value: string) => {
     setClienteSel(value);
-    setFormValues((prev) => ({ ...prev, clienteId: value }));
   };
 
+  // Spread correcto para acumular cambios en formValues
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormValues((prev) => ({ ...prev, [name]: value }));
@@ -125,7 +128,11 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
     e.preventDefault();
     if (!clienteSel) return;
 
-    const payload: CasoData = { ...(formValues as CasoData), clienteId: clienteSel };
+    // payload sólo con los campos de CasoData
+    const payload: CasoData = {
+      ...(formValues as CasoData),
+    };
+
     if (isEditing && selectedCaso) {
       onModificar(selectedCaso._id, payload);
     } else {
@@ -140,10 +147,11 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
     setShowForm(false);
   };
 
+  // filtro de lista
   const casosFiltrados = casos.filter((c) => {
     const cli = clientes.find((x) => x.id === c.clienteId);
     const matchName = cli
-      ? (cli.name ?? "").toLowerCase().includes(searchTerm.toLowerCase())
+      ? cli.name.toLowerCase().includes(searchTerm.toLowerCase())
       : false;
     const matchPriority = !priorityFilter || c.prioridad === priorityFilter;
     return matchName && matchPriority;
@@ -154,7 +162,9 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
       <div className="card">
         <Header
           showForm={showForm}
-          toggleForm={() => (showForm ? setShowForm(false) : openNew())}
+          toggleForm={() =>
+            showForm ? setShowForm(false) : openNew()
+          }
         />
 
         {showForm && (
@@ -208,3 +218,4 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
 };
 
 export default GestionCasos;
+

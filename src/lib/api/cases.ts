@@ -15,18 +15,28 @@ export async function getCasos(lawFirmCode: string): Promise<Caso[]> {
 
 /**
  * Crea un nuevo caso.
+ *
+ * Importante: `data` no debe llevar `clienteId` porque lo pasamos
+ * como parámetro por separado.
  */
 export function crearCaso(
   lawFirmCode: string,
   clienteId: string,
-  data: CasoData,
+  data: Omit<CasoData, "clienteId">,
   userCode: string,
   userName: string
 ): Promise<{ caso: Caso }> {
   return callFn<{ caso: Caso }>("createCaso", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ lawFirmCode, clienteId, data, userCode, userName }),
+    body: JSON.stringify({
+      lawFirmCode,
+      clienteId,
+      userCode,
+      userName,
+      // aquí sólo los campos de CasoData sin clienteId
+      ...data,
+    }),
   });
 }
 
@@ -47,7 +57,7 @@ export function updateCaso(
 }
 
 /**
- * Elimina un caso por su ID.
+ * Elimina un caso.
  */
 export function deleteCaso(
   lawFirmCode: string,

@@ -7,8 +7,8 @@ import { CasoLog } from "../../src/lib/models/CasoLog";
 
 export const handler: Handler = async (event) => {
   try {
+    // 1. Parseo y validación de entrada
     const { lawFirmCode, casoId, userCode, userName } = JSON.parse(event.body || "{}");
-
     if (!lawFirmCode || !casoId || !userCode || !userName) {
       return {
         statusCode: 400,
@@ -16,21 +16,30 @@ export const handler: Handler = async (event) => {
       };
     }
 
+    // 2. Conexión a la base de datos
     await connectDB();
+    console.log("✓ Conectado a MongoDB, borrando caso:", { lawFirmCode, casoId });
 
-    // Eliminación (soft delete o hard delete según esquema)
-    await Caso.deleteOne({ _id: casoId, lawFirmCode });
+    // 3. Borrado del caso
+    const deleted = await Caso.findOneAndDelete({ _id: casoId, lawFirmCode });
+    if (!deleted) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: "Caso no encontrado" }),
+      };
+    }
 
-    // Log de la eliminación
+    // 4. Logging de la operación
     await CasoLog.create({
       lawFirmCode,
-      caseId: casoId,
+      casoId,
+      action: "eliminar",
       userCode,
       userName,
-      action: `eliminó caso ID ${casoId}`,
       timestamp: new Date(),
     });
 
+    // 5. Respuesta exitosa
     return {
       statusCode: 200,
       body: JSON.stringify({ success: true }),
