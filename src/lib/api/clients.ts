@@ -18,7 +18,7 @@ export async function getClientes(lawFirmCode: string): Promise<Cliente[]> {
  */
 export async function createClient(
   lawFirmCode: string,
-  data: Omit<Cliente, "createdAt" | "updatedAt">,
+  data: Omit<Cliente, "id" | "lawFirmCode" | "createdAt" | "updatedAt">,
   userCode: string,
   userName: string
 ): Promise<Cliente> {
@@ -31,7 +31,42 @@ export async function createClient(
 }
 
 /**
- * Obtiene el log de operaciones sobre clientes.
+ * Actualiza un cliente existente.
+ */
+export async function updateClient(
+  lawFirmCode: string,
+  id: string,
+  updates: Partial<Cliente>,
+  userCode: string,
+  userName: string
+): Promise<Cliente> {
+  const { client } = await callFn<{ client: Cliente }>("updateClient", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ lawFirmCode, userCode, userName, id, updates }),
+  });
+  return client;
+}
+
+/**
+ * Elimina un cliente.
+ */
+export async function deleteClient(
+  lawFirmCode: string,
+  id: string,
+  userCode: string,
+  userName: string
+): Promise<{ success: boolean }> {
+  const { success } = await callFn<{ success: boolean }>("deleteClient", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ lawFirmCode, userCode, userName, id }),
+  });
+  return success;
+}
+
+/**
+ * Obtiene el registro de actividad de clientes.
  */
 export async function getClientLog(
   lawFirmCode: string

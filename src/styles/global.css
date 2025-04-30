@@ -328,7 +328,19 @@ a:hover {
 /* Footer inside modal */
 .modalFooter {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: var(--space-3);
+}
+
+/* Card – ítems interactivos */
+
+.card ul li {
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  padding: var(--space-1) var(--space-1);
+}
+.card ul li:hover {
+  background-color: #2c2c2e;         /* un tono ligeramente más claro */
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+  cursor: pointer;                    /* cursor de mano al pasar */
 }
 
