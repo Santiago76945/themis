@@ -3,7 +3,7 @@
 "use client";
 
 import React from "react";
-import type { Cliente, Caso, CasoData } from "@/lib/api/types";
+import type { Cliente, Caso } from "@/lib/api/types";
 import styles from "@/styles/GestionCasos.module.css";
 
 interface CaseCardProps {
@@ -19,27 +19,30 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   onEdit,
   onEliminar,
 }) => {
-  const cliente = clientes.find(c => c.id === caso.clienteId);
+  const cliente = clientes.find((c) => c.id === caso.clienteId);
 
   return (
     <div className="card-secondary">
       <strong className="mb-1">
-        {cliente
-          ? `${cliente.firstName} ${cliente.lastName}`
-          : "Cliente desconocido"}
+        {cliente ? cliente.name : "Cliente desconocido"}
       </strong>
       <p>Referencia: {caso.referencia || "—"}</p>
-      {/* aquí podrías añadir Próx. Acción y Fecha si quieres */}
       <div className={styles.caseActions}>
         <button
           className="btn btn-link"
-          onClick={() => onEdit(caso)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(caso);
+          }}
         >
           Editar
         </button>
         <button
           className="btn btn-link"
-          onClick={() => onEliminar(caso._id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEliminar(caso._id);
+          }}
         >
           Eliminar
         </button>

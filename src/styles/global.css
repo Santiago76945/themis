@@ -183,6 +183,7 @@ button, input, select, textarea {
 }
 .btn-secondary {
   background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+  margin-bottom: 20px;
 }
 /* Uniformidad de altura y centrado interno */
 .btn,

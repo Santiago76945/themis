@@ -7,8 +7,9 @@ import { CasoLog } from "../../src/lib/models/CasoLog";
 
 export const handler: Handler = async (event) => {
   try {
-    const { casoId, userCode, userName } = JSON.parse(event.body || "{}");
-    if (!casoId || !userCode || !userName) {
+    const { lawFirmCode, casoId, userCode, userName } = JSON.parse(event.body || "{}");
+
+    if (!lawFirmCode || !casoId || !userCode || !userName) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Faltan datos requeridos" }),
@@ -16,16 +17,19 @@ export const handler: Handler = async (event) => {
     }
 
     await connectDB();
-    const caso = await Caso.findOneAndDelete({ _id: casoId });
-    if (caso) {
-      await CasoLog.create({
-        lawFirmCode: caso.lawFirmCode,
-        caseId: caso._id,
-        userName,
-        action: `eliminó caso “${caso.referencia}”`,
-        timestamp: new Date(),
-      });
-    }
+
+    // Eliminación (soft delete o hard delete según esquema)
+    await Caso.deleteOne({ _id: casoId, lawFirmCode });
+
+    // Log de la eliminación
+    await CasoLog.create({
+      lawFirmCode,
+      caseId: casoId,
+      userCode,
+      userName,
+      action: `eliminó caso ID ${casoId}`,
+      timestamp: new Date(),
+    });
 
     return {
       statusCode: 200,

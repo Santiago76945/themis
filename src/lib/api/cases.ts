@@ -17,6 +17,7 @@ export async function getCasos(lawFirmCode: string): Promise<Caso[]> {
  * Crea un nuevo caso.
  */
 export function crearCaso(
+  lawFirmCode: string,
   clienteId: string,
   data: CasoData,
   userCode: string,
@@ -25,7 +26,7 @@ export function crearCaso(
   return callFn<{ caso: Caso }>("createCaso", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ clienteId, data, userCode, userName }),
+    body: JSON.stringify({ lawFirmCode, clienteId, data, userCode, userName }),
   });
 }
 
@@ -49,6 +50,7 @@ export function updateCaso(
  * Elimina un caso por su ID.
  */
 export function deleteCaso(
+  lawFirmCode: string,
   casoId: string,
   userCode: string,
   userName: string
@@ -56,14 +58,16 @@ export function deleteCaso(
   return callFn<{ success: boolean }>("deleteCaso", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ casoId, userCode, userName }),
+    body: JSON.stringify({ lawFirmCode, casoId, userCode, userName }),
   });
 }
 
 /**
  * Obtiene el log de operaciones sobre casos.
  */
-export async function getLogCasos(): Promise<LogEntry[]> {
-  const { logs } = await callFn<{ logs: LogEntry[] }>("getLogCasos");
+export async function getLogCasos(lawFirmCode: string): Promise<LogEntry[]> {
+  const { logs } = await callFn<{ logs: LogEntry[] }>(
+    `getLogCasos?lawFirmCode=${encodeURIComponent(lawFirmCode)}`
+  );
   return logs;
 }

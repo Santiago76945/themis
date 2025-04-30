@@ -2,7 +2,13 @@
 
 "use client";
 
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import React, {
+  useState,
+  useEffect,
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+} from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import type { Cliente, Caso, CasoData, LogEntry } from "@/lib/api/types";
@@ -11,6 +17,7 @@ import { Header } from "./Header";
 import { Form } from "./Form";
 import { Filters } from "./Filters";
 import { CaseList } from "./CaseList";
+import { CaseDetailsModal } from "./CaseDetailsModal";
 import { LogList } from "./LogList";
 import { Footer } from "./Footer";
 
@@ -35,30 +42,43 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
   const { userData } = useAuth();
   const userCode = userData?.uniqueCode ?? "";
 
-  // Mostrar formulario y modo edición
+  // mostrar formulario / modal / edición
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedCaso, setSelectedCaso] = useState<Caso | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
 
-  // Valores del formulario
+  // valores del formulario como parcial
   const [clienteSel, setClienteSel] = useState("");
-  const [formValues, setFormValues] = useState<CasoData>({});
+  const [formValues, setFormValues] = useState<Partial<CasoData>>({});
 
-  // Filtros de lista
   const [searchTerm, setSearchTerm] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState<"" | "Alta" | "Media" | "Baja">("");
+  const [priorityFilter, setPriorityFilter] = useState<
+    "" | "Alta" | "Media" | "Baja"
+  >("");
   const [showLogs, setShowLogs] = useState(false);
 
+  // carga lawFirmCode si necesita
   useEffect(() => {
     if (!userCode) return;
     getMyLawFirm(userCode).catch(console.error);
   }, [userCode]);
 
+  const openNew = () => {
+    setSelectedCaso(null);
+    setFormValues({});
+    setClienteSel("");
+    setIsEditing(false);
+    setShowForm(true);
+    setShowDetails(false);
+    setShowLogs(false);
+  };
+
+  // abre formulario en modo edición
   const openEdit = (c: Caso) => {
     setSelectedCaso(c);
     setClienteSel(c.clienteId);
-    setFormValues({ 
-      clienteId: c.clienteId,
+    setFormValues({
       rol: c.rol,
       caseType: c.caseType,
       honorariosEstimados: c.honorariosEstimados,
@@ -74,32 +94,45 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
     });
     setIsEditing(true);
     setShowForm(true);
+    setShowDetails(false);
+    setShowLogs(false);
+  };
+
+  const openDetails = (c: Caso) => {
+    setSelectedCaso(c);
+    setShowDetails(true);
+    setShowForm(false);
+    setShowLogs(false);
+  };
+
+  const closeDetails = () => {
+    setShowDetails(false);
   };
 
   const handleClienteChange = (value: string) => {
     setClienteSel(value);
-    setFormValues(prev => ({ ...prev, clienteId: value }));
+    setFormValues((prev) => ({ ...prev, clienteId: value }));
   };
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormValues(prev => ({ ...prev, [name]: value }));
+    setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!clienteSel) return;
 
-    const payload: CasoData = { ...formValues, clienteId: clienteSel };
+    const payload: CasoData = { ...(formValues as CasoData), clienteId: clienteSel };
     if (isEditing && selectedCaso) {
       onModificar(selectedCaso._id, payload);
     } else {
       onCrear(clienteSel, payload);
     }
 
-    // Reset
+    // reset
     setFormValues({});
     setClienteSel("");
     setIsEditing(false);
@@ -107,10 +140,10 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
     setShowForm(false);
   };
 
-  const casosFiltrados = casos.filter(c => {
-    const cli = clientes.find(x => x.id === c.clienteId);
+  const casosFiltrados = casos.filter((c) => {
+    const cli = clientes.find((x) => x.id === c.clienteId);
     const matchName = cli
-      ? cli.name.toLowerCase().includes(searchTerm.toLowerCase())
+      ? (cli.name ?? "").toLowerCase().includes(searchTerm.toLowerCase())
       : false;
     const matchPriority = !priorityFilter || c.prioridad === priorityFilter;
     return matchName && matchPriority;
@@ -119,7 +152,10 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
   return (
     <div className="container">
       <div className="card">
-        <Header showForm={showForm} toggleForm={() => setShowForm(v => !v)} />
+        <Header
+          showForm={showForm}
+          toggleForm={() => (showForm ? setShowForm(false) : openNew())}
+        />
 
         {showForm && (
           <Form
@@ -145,12 +181,25 @@ const GestionCasos: React.FC<GestionCasosProps> = ({
           clientes={clientes}
           onEdit={openEdit}
           onEliminar={onEliminar}
+          onViewDetails={openDetails}
         />
+
+        {showDetails && selectedCaso && (
+          <CaseDetailsModal
+            caso={selectedCaso}
+            clientes={clientes}
+            onClose={closeDetails}
+          />
+        )}
 
         {showLogs && <LogList log={log} />}
 
         <Footer
-          onToggleLogs={() => setShowLogs(v => !v)}
+          onToggleLogs={() => {
+            setShowLogs((v) => !v);
+            setShowForm(false);
+            setShowDetails(false);
+          }}
           onBack={() => router.push("/menu")}
         />
       </div>

@@ -9,7 +9,7 @@ import styles from "@/styles/GestionCasos.module.css";
 interface FormProps {
   clientes: Cliente[];
   clienteSel: string;
-  formValues: CasoData;
+  formValues: Partial<CasoData>;
   onClienteChange: (clienteId: string) => void;
   onChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -64,7 +64,7 @@ export const Form: React.FC<FormProps> = ({
           />
         </div>
 
-        {/* Caso propio o delegado */}
+        {/* Tipo de Caso */}
         <div className={styles.field}>
           <label htmlFor="caseType">Tipo de Caso*</label>
           <select
@@ -90,12 +90,12 @@ export const Form: React.FC<FormProps> = ({
             type="number"
             step="0.01"
             className="input"
-            value={formValues.honorariosEstimados || ""}
+            value={formValues.honorariosEstimados ?? ""}
             onChange={onChange}
           />
         </div>
 
-        {/* Referencia: Descripción */}
+        {/* Referencia */}
         <div className={styles.field}>
           <label htmlFor="referencia">Referencia*</label>
           <input

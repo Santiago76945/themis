@@ -7,9 +7,17 @@ import { CasoLog } from "../../src/lib/models/CasoLog";
 
 export const handler: Handler = async (event) => {
   try {
-    const { clienteId, data, userCode, userName } = JSON.parse(event.body || "{}");
+    const {
+      lawFirmCode,
+      clienteId,
+      data,
+      userCode,
+      userName,
+    } = JSON.parse(event.body || "{}");
+
     // Validaciones de campos obligatorios
     if (
+      !lawFirmCode ||
       !clienteId ||
       !data ||
       !data.rol ||
@@ -26,7 +34,10 @@ export const handler: Handler = async (event) => {
     }
 
     await connectDB();
+
+    // Crear caso con lawFirmCode incluido
     const caso = await Caso.create({
+      lawFirmCode,
       clienteId,
       rol: data.rol,
       caseType: data.caseType,
@@ -40,12 +51,15 @@ export const handler: Handler = async (event) => {
       fechaProximaTarea: data.fechaProximaTarea,
       prioridad: data.prioridad,
       observaciones: data.observaciones,
-      lawFirmCode: data.lawFirmCode,      // si tu esquema lo incluye
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
+    // Registrar en log
     await CasoLog.create({
-      lawFirmCode: caso.lawFirmCode,
-      caseId: caso._id,
+      lawFirmCode,
+      caseId: String(caso._id),
+      userCode,
       userName,
       action: `creó caso “${data.referencia}”`,
       timestamp: new Date(),

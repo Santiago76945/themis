@@ -25,57 +25,58 @@ export const CaseDetailsModal: React.FC<CaseDetailsModalProps> = ({
 
         <p>
           <strong>Cliente:</strong>{" "}
-          {cliente
-            ? `${cliente.firstName} ${cliente.lastName}`
-            : "Desconocido"}
+          {cliente ? cliente.name : "Desconocido"}
         </p>
         <p>
-          <strong>Referencia:</strong> {caso.referencia || "—"}
+          <strong>Rol:</strong> {caso.rol}
         </p>
         <p>
-          <strong>Expediente:</strong> {caso.numeroExpediente || "—"}
+          <strong>Tipo de Caso:</strong> {caso.caseType === "propio" ? "Propio" : "Delegado"}
         </p>
         <p>
-          <strong>Prioridad:</strong> {caso.prioridad || "—"}
-        </p>
-        <p>
-          <strong>Descripción:</strong> {caso.descripcion || "—"}
-        </p>
-        <p>
-          <strong>Tribunal:</strong> {caso.tribunal || "—"}
-        </p>
-        <p>
-          <strong>Etapa procesal:</strong> {caso.etapaProcesal || "—"}
-        </p>
-        <p>
-          <strong>Próxima acción:</strong> {caso.proximaAccion || "—"}
-        </p>
-        <p>
-          <strong>Fecha Próx. Acción:</strong>{" "}
-          {caso.fechaProximaAccion
-            ? new Date(caso.fechaProximaAccion).toLocaleDateString("es-AR")
+          <strong>Honorarios Estimados:</strong>{" "}
+          {caso.honorariosEstimados != null
+            ? caso.honorariosEstimados.toLocaleString("es-AR", { style: "currency", currency: "ARS" })
             : "—"}
         </p>
         <p>
-          <strong>Fecha Inicio Juicio:</strong>{" "}
-          {caso.fechaInicioJuicio
-            ? new Date(caso.fechaInicioJuicio).toLocaleDateString("es-AR")
+          <strong>Referencia:</strong> {caso.referencia}
+        </p>
+        <p>
+          <strong>Número de Expediente:</strong> {caso.numeroExpediente || "—"}
+        </p>
+        <p>
+          <strong>Carátula:</strong> {caso.caratula || "—"}
+        </p>
+        <p>
+          <strong>Juzgado / Tribunal:</strong> {caso.tribunal || "—"}
+        </p>
+        <p>
+          <strong>Estado:</strong> {caso.estado || "—"}
+        </p>
+        <p>
+          <strong>Próxima Tarea:</strong> {caso.proximaTarea || "—"}
+        </p>
+        <p>
+          <strong>Fecha Próxima Tarea:</strong>{" "}
+          {caso.fechaProximaTarea
+            ? new Date(caso.fechaProximaTarea).toLocaleDateString("es-AR")
             : "—"}
         </p>
         <p>
-          <strong>Responsable/s:</strong> {caso.responsables || "—"}
+          <strong>Prioridad:</strong> {caso.prioridad}
         </p>
+        <p>
+          <strong>Observaciones:</strong> {caso.observaciones || "—"}
+        </p>
+        <hr className="divider" />
         <p>
           <strong>Creado:</strong>{" "}
-          {caso.createdAt
-            ? new Date(caso.createdAt).toLocaleString("es-AR")
-            : "—"}
+          {new Date(caso.createdAt).toLocaleString("es-AR")}
         </p>
         <p>
           <strong>Actualizado:</strong>{" "}
-          {caso.updatedAt
-            ? new Date(caso.updatedAt).toLocaleString("es-AR")
-            : "—"}
+          {new Date(caso.updatedAt).toLocaleString("es-AR")}
         </p>
 
         <div className="modalFooter">

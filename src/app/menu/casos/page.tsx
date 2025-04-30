@@ -7,20 +7,21 @@ import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
 import {
   Cliente,
+  Caso,
   CasoData,
   LogEntry,
   getClientes,
+  getCasos,
   crearCaso,
-  modificarCaso,
-  eliminarCaso,
+  updateCaso,
+  deleteCaso,
   getLogCasos,
-  getCasos,             // ← Import añadido
-  Caso,                 // ← Interfaz de caso
 } from "@/lib/api";
 
-const GestionCasos = dynamic(() => import("@/components/GestionCasos/GestionCasos"), {
-  ssr: false,
-});
+const GestionCasos = dynamic(
+  () => import("@/components/GestionCasos/GestionCasos"),
+  { ssr: false }
+);
 
 export default function CasosPage() {
   const { userData } = useAuth();
@@ -39,32 +40,38 @@ export default function CasosPage() {
 
     getClientes(lawFirmCode).then(setClientes).catch(console.error);
     getCasos(lawFirmCode).then(setCasos).catch(console.error);
-    getLogCasos().then(setLog).catch(console.error);
+    getLogCasos(lawFirmCode).then(setLog).catch(console.error);
   }, [lawFirmCode]);
 
   // Funciones manejadoras
   const handleCrear = (clienteId: string, data: CasoData) =>
-    crearCaso(clienteId, data, userCode, userName)
-      .then(() => Promise.all([
-        getCasos(lawFirmCode).then(setCasos),
-        getLogCasos().then(setLog),
-      ]))
+    crearCaso(lawFirmCode, clienteId, data, userCode, userName)
+      .then(() =>
+        Promise.all([
+          getCasos(lawFirmCode).then(setCasos),
+          getLogCasos(lawFirmCode).then(setLog),
+        ])
+      )
       .catch((err) => console.error("Error al crear caso:", err));
 
   const handleModificar = (casoId: string, data: CasoData) =>
-    modificarCaso(casoId, data, userCode, userName)
-      .then(() => Promise.all([
-        getCasos(lawFirmCode).then(setCasos),
-        getLogCasos().then(setLog),
-      ]))
+    updateCaso(casoId, data, userCode, userName)
+      .then(() =>
+        Promise.all([
+          getCasos(lawFirmCode).then(setCasos),
+          getLogCasos(lawFirmCode).then(setLog),
+        ])
+      )
       .catch((err) => console.error("Error al modificar caso:", err));
 
   const handleEliminar = (casoId: string) =>
-    eliminarCaso(casoId, userCode, userName)
-      .then(() => Promise.all([
-        getCasos(lawFirmCode).then(setCasos),
-        getLogCasos().then(setLog),
-      ]))
+    deleteCaso(lawFirmCode, casoId, userCode, userName)
+      .then(() =>
+        Promise.all([
+          getCasos(lawFirmCode).then(setCasos),
+          getLogCasos(lawFirmCode).then(setLog),
+        ])
+      )
       .catch((err) => console.error("Error al eliminar caso:", err));
 
   return (
