@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
 
+
 // Carga dinámica para evitar problemas de SSR
 const TaskManager = dynamic(
   () => import("@/components/TaskManager"),
