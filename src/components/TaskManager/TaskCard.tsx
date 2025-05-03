@@ -9,21 +9,21 @@ import styles from "@/styles/TaskManager.module.css";
 export interface TaskCardProps {
   task: Task;
   clients: Cliente[];
+  onViewDetails: (task: Task) => void;
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
-  onViewDetails: (task: Task) => void;
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({
   task,
   clients,
+  onViewDetails,
   onEdit,
   onDelete,
-  onViewDetails,
 }) => {
   const cliente = clients.find((c) => c.id === task.clienteId);
-  const procClass = task.prioridadProcesal.toLowerCase();
-  const comClass  = task.prioridadComercial.toLowerCase();
+  const prioridadProc = task.prioridadProcesal?.toLowerCase() ?? "";
+  const prioridadCom = task.prioridadComercial?.toLowerCase() ?? "";
 
   return (
     <div className={styles.taskCard}>
@@ -33,41 +33,36 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           <small>{task.estado}</small>
           <small>
             Proc: {task.prioridadProcesal}
-            <span className={`${styles.dot} ${styles[procClass]}`} />
+            <span className={`${styles.dot} ${styles[prioridadProc]}`} />
           </small>
           <small>
             Com: {task.prioridadComercial}
-            <span className={`${styles.dot} ${styles[comClass]}`} />
+            <span className={`${styles.dot} ${styles[prioridadCom]}`} />
           </small>
         </div>
       </div>
 
       <div className={styles.cardContent}>
         {task.description && <p>{task.description}</p>}
-        {cliente && (
+        {cliente ? (
           <p>
-            Cliente: {cliente.firstName} {cliente.lastName}
+            <strong>Cliente:</strong> {cliente.name}
+          </p>
+        ) : (
+          <p>
+            <strong>Cliente:</strong> —
           </p>
         )}
       </div>
 
       <div className={styles.cardActions}>
-        <button
-          className="btn btn-link"
-          onClick={() => onViewDetails(task)}
-        >
+        <button className="btn btn-link" onClick={() => onViewDetails(task)}>
           Ver detalles
         </button>
-        <button
-          className="btn btn-link"
-          onClick={() => onEdit(task)}
-        >
+        <button className="btn btn-link" onClick={() => onEdit(task)}>
           Editar
         </button>
-        <button
-          className="btn btn-link"
-          onClick={() => onDelete(task._id)}
-        >
+        <button className="btn btn-link" onClick={() => onDelete(task._id)}>
           Eliminar
         </button>
       </div>
